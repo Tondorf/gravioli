@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+message Sphere {
+    double x = 1;
+    double y = 2;
+    // double z = 3; // hehe
+    double mass = 4;
+    double radius = 5;
+}
+
+message Player {
+    uint32 id          = 1; // referenced from Shot.origin
+    string name        = 2;
+    uint32 skillpoints = 3; // to be used later
+    uint32 homebaseID  = 4; // reference to Planet.id
+    double aim         = 5; // in radian (0 - 2pi)
+    //double cooldown    = 6; // remaining time in seconds
+}
+
+message Shot {
+    uint32 id     = 1;
+    uint32 origin = 2; // reference to Player.id
+    Sphere sphere = 3;
+    double dir    = 4; // in radian (0 - 2pi)
+    double speed  = 5;
+    double ttl    = 6; // time in seconds
+    //double dmg    = 7; // inflicted dmg on impact
+}
+
+message Planet {
+    uint32 id     = 1; // referenced from Player.homebaseID (not all planets are homebases)
+    Sphere sphere = 2;
+    double health = 3;
+}
+
+
+
+message World {
+    repeated Planet planets = 1;
+    repeated Shot   shots   = 2;
+    repeated Player players = 3;
+}
+
+
+
+message MoveAction {
+    enum Dir {
+        HALT = 0;
+        LEFT = 1;
+        RIGHT = 2;
+    }
+    Dir dir = 1;
+}
+
+message FireAction {
+    enum Projectile {
+        NOTHING = 0;
+        SHOT = 1;
+        LASER = 2;
+    }
+    Projectile firing = 1;
+}
+
+message PerksInfo {
+    map<string, string> perks = 1; // id → description
+}
+
+message PerkPurchaseAction {
+    // perks to purchase...
+    string perk = 1;
+}
+
+message GunsightPositioningAction {
+    double position = 1; // radian
+}
