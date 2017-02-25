@@ -14,7 +14,7 @@ message Player {
     uint32 skillpoints = 3; // to be used later
     uint32 homebaseID  = 4; // reference to Planet.id
     double aim         = 5; // in radian (0 - 2pi)
-    //double cooldown    = 6; // remaining time in seconds
+    double cooldown    = 6; // remaining time in seconds
 }
 
 message Shot {
@@ -24,7 +24,7 @@ message Shot {
     double dir    = 4; // in radian (0 - 2pi)
     double speed  = 5;
     double ttl    = 6; // time in seconds
-    //double dmg    = 7; // inflicted dmg on impact
+    double dmg    = 7; // inflicted dmg on impact
 }
 
 message Planet {
@@ -43,11 +43,11 @@ message World {
 
 
 
-message MoveAction {
+message RotateAction {
     enum Dir {
         HALT = 0;
-        LEFT = 1;
-        RIGHT = 2;
+        LEFT = 1; // counter clockwise
+        RIGHT = 2; // clockwise
     }
     Dir dir = 1;
 }
