@@ -2,6 +2,8 @@
 #include "logger.h"
 #include "server.h"
 
+#include "gravioli.pb.h"
+
 
 Server &Server::getInstance() {
   static Server instance;
@@ -9,9 +11,14 @@ Server &Server::getInstance() {
 }
 
 Server::Server() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
 }
 
 Server::~Server() {
+}
+
+void Server::stop() {
+  google::protobuf::ShutdownProtobufLibrary();
 }
 
 void Server::addClient(std::shared_ptr<Client> client) {

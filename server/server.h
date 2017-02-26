@@ -18,6 +18,8 @@ public:
   Server(Server const &) = delete;
   void operator=(Server const &) = delete;
 
+  void stop();
+
   void addClient(std::shared_ptr<Client>);
   void removeClient(std::size_t);
   bool getClient(std::size_t key, std::shared_ptr<Client> &);
