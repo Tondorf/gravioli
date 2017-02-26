@@ -6,8 +6,6 @@
 #include "logger.h"
 #include "server.h"
 
-#include "gravioli.pb.h"
-
 Server &Server::getInstance() {
   static Server instance;
   return instance;
@@ -40,11 +38,7 @@ void Server::addClient(std::shared_ptr<Client> client) {
   auto msg = new api::Message;
   msg->set_allocated_accept(acc);
   assert(msg->IsInitialized());
-
-  std::stringstream ss;
-  msg->SerializeToOstream(&ss);
-  auto datastring = ss.str();
-  client->send(std::vector<std::uint8_t>(datastring.begin(), datastring.end()));
+  client->send(serializeMessage(msg));
 }
 
 void Server::removeClient(std::size_t id) {
@@ -129,11 +123,8 @@ void Server::loop() {
   auto message = new api::Message;
   message->set_allocated_world(world);
   assert(message->IsInitialized());
+  auto serializedWorld = serializeMessage(message);
 
-  std::stringstream ss;
-  message->SerializeToOstream(&ss);
-
-  std::string datastring = ss.str();
   auto all =  [](const Client &)->bool { return true; };
 
   while (_running) {
@@ -146,7 +137,7 @@ void Server::loop() {
       }
     });
 
-    send(std::vector<std::uint8_t>(datastring.begin(), datastring.end()), all);
+    send(serializedWorld, all);
 
     auto stop = std::chrono::system_clock::now();
     auto dt = static_cast<std::size_t>(std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count());
@@ -166,4 +157,12 @@ void Server::forAllClients(std::function<void(Client &)> f) {
   for (auto kv : _clients) {
     f(*(kv.second));
   }
+}
+
+std::vector<std::uint8_t> Server::serializeMessage(api::Message *msg) {
+  std::stringstream ss;
+  msg->SerializeToOstream(&ss);
+
+  std::string datastring = ss.str();
+  return std::vector<std::uint8_t>(datastring.begin(), datastring.end());
 }
