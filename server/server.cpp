@@ -107,7 +107,7 @@ void Server::loop() {
   assert(shot->IsInitialized());
 
   player->set_id(0);
-  player->set_name("Mutterkuchenkontaktbolzen");
+  player->set_name("Muttermundkontaktbolzen");
   player->set_skillpoints(0);
   player->set_homebaseid(0);
   player->set_aim(3.14159);
