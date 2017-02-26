@@ -5,16 +5,16 @@ package api;
 message Message {
   optional Request request = 1;
   optional Accept accept = 2;
-  optional World = 3;
-  optional Action = 4;
+  optional World world = 3;
+  optional Action action = 4;
 }
 
 message Request {
-    required string name;
+    required string name = 1;
 }
 
 message Accept {
-    required uint32 id;
+    required uint32 id = 1;
 }
 
 message Sphere {
@@ -85,3 +85,4 @@ message PerkPurchaseAction {
 message GunsightPositioningAction {
     required double position = 1; // radian
 }
+
