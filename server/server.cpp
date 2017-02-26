@@ -135,6 +135,8 @@ void Server::loop() {
     auto timeleft = 10 - dt;
     if (timeleft > 0) {
       std::this_thread::sleep_for(std::chrono::milliseconds(timeleft));
+    } else {
+      Log::warning("Calculation in game loop took more time than allowed.");
     }
   }
 }
