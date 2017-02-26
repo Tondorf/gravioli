@@ -2,6 +2,21 @@ syntax = "proto2";
 
 package api;
 
+message Root {
+  optional Request request = 1;
+  optional Accept accept = 2;
+  optional World = 3;
+  optional Action = 4;
+}
+
+message Request {
+    required string name;
+}
+
+message Accept {
+    required uint32 id;
+}
+
 message Sphere {
     required double x = 1;
     required double y = 2;
@@ -20,7 +35,7 @@ message Player {
 
 message Shot {
     required uint32 id     = 1;
-    required uint32 origin = 2; // reference to Player.id
+    optional uint32 origin = 2; // reference to Player.id
     required Sphere sphere = 3;
     required double dir    = 4; // in radian (0 - 2pi)
     required double speed  = 5;
