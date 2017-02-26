@@ -5,7 +5,7 @@
 #include "logger.h"
 
 namespace Log {
-    SimpleLogger::SimpleLogger() : _logLevel(LogLevel::INFO), _out(stdout) {
+    SimpleLogger::SimpleLogger() : _out(stdout), _logLevel(LogLevel::INFO) {
     }
 
     SimpleLogger::~SimpleLogger() {
