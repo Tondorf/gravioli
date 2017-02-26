@@ -4,7 +4,7 @@
 
 namespace Log {
     enum class LogLevel {
-        DEBUG = 0, INFO = 1, ERROR = 2
+        DEBUG = 0, INFO = 1, WARNING = 2, ERROR = 3
     };
 
     class SimpleLogger {
@@ -33,6 +33,8 @@ namespace Log {
     void debug(const char *, ...);
 
     void info(const char *, ...);
+
+    void warning(const char *, ...);
 
     void error(const char *, ...);
 };

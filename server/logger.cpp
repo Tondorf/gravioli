@@ -34,6 +34,9 @@ namespace Log {
                 case LogLevel::INFO:
                     fprintf(_out, "[INFO] ");
                     break;
+                case LogLevel::WARNING:
+                    fprintf(_out, "[WARNING] ");
+                    break;
                 case LogLevel::ERROR:
                     fprintf(_out, "[ERROR] ");
                     break;
@@ -57,6 +60,13 @@ namespace Log {
         va_list args;
         va_start(args, msg);
         SimpleLogger::getInstance().log(LogLevel::INFO, msg, args);
+        va_end(args);
+    }
+
+    void warning(const char *msg, ...) {
+        va_list args;
+        va_start(args, msg);
+        SimpleLogger::getInstance().log(LogLevel::WARNING, msg, args);
         va_end(args);
     }
 
