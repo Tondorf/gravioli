@@ -126,7 +126,15 @@ void Server::loop() {
   auto all =  [](const Client &)->bool { return true; };
 
   while (_running) {
+    auto start = std::chrono::system_clock::now();
+
     send(std::vector<std::uint8_t>(datastring.begin(), datastring.end()), all);
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+    auto stop = std::chrono::system_clock::now();
+    auto dt = static_cast<std::size_t>(std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count());
+    auto timeleft = 10 - dt;
+    if (timeleft > 0) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(timeleft));
+    }
   }
 }
