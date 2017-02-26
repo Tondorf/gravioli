@@ -5,13 +5,16 @@ SOURCES=main.cpp server.cpp client.cpp logger.cpp gravioli.pb.cc
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=server
 
-all: $(SOURCES) $(EXECUTABLE)
+all: proto $(SOURCES) $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 
 .cpp.o:
 	$(CC) $(CFLAGS) $< -o $@
+
+proto:
+	protoc -I=.. ../gravioli.proto --cpp_out=.
 
 clean:
 	rm *.o $(EXECUTABLE)
