@@ -19,7 +19,7 @@ func Connect(server string, port int, w chan *api.World) error {
 	}
 	defer conn.Close()
 	go fetchWorldForever(conn, w)
-	sendInputsForever(conn)
+	//sendInputsForever(conn, )
 	return nil
 }
 
