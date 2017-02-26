@@ -82,6 +82,8 @@ void onSignal(evutil_socket_t, short, void *arg) {
 
   Log::info("Caught an interrupt signal; exiting cleanly in two seconds.");
 
+  Server::getInstance().stop();
+
 	event_base_loopexit(base, &delay);
 }
 
@@ -103,6 +105,9 @@ int main(int argc, char **argv) {
 
   Log::SimpleLogger::getInstance().setLogLevel(Log::LogLevel::DEBUG);
   Log::debug("Setting log level to DEBUG");
+
+  // start server
+  Server::getInstance();
 
   std::uint16_t port = atoi(argv[1]);
   Log::info("Starting server on port %d.", port);

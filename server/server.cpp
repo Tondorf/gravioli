@@ -12,12 +12,18 @@ Server &Server::getInstance() {
 
 Server::Server() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  _thread = std::make_shared<std::thread>(&Server::loop, this);
 }
 
 Server::~Server() {
 }
 
 void Server::stop() {
+  Log::info("Stopping game loop.");
+  _running = false;
+  _thread->join();
+
   google::protobuf::ShutdownProtobufLibrary();
 }
 
@@ -53,4 +59,8 @@ void Server::send(const std::vector<std::uint8_t> &msg, std::function<bool(const
       client->send(msg);
     }
   }
+}
+
+void Server::loop() {
+  Log::debug("Starting game loop.");
 }
