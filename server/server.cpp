@@ -69,10 +69,10 @@ void Server::send(const std::vector<std::uint8_t> &msg, std::function<bool(const
 void Server::loop() {
   Log::debug("Starting game loop.");
   
-  api::World world;
-  auto planet = world.add_planets();
-  auto shot = world.add_shots();
-  auto player = world.add_players();
+  auto world = new api::World;
+  auto planet = world->add_planets();
+  auto shot = world->add_shots();
+  auto player = world->add_players();
 
   assert(planet != nullptr);
   assert(shot != nullptr);
@@ -114,11 +114,15 @@ void Server::loop() {
   player->set_cooldown(1.);
   assert(player->IsInitialized());
 
-  assert(world.IsInitialized());
-  std::stringstream sw;
-  world.SerializeToOstream(&sw);
+  assert(world->IsInitialized());
+  auto message = new api::Message;
+  message->set_allocated_world(world);
+  assert(message->IsInitialized());
 
-  std::string datastring = sw.str();
+  std::stringstream ss;
+  message->SerializeToOstream(&ss);
+
+  std::string datastring = ss.str();
   auto all =  [](const Client &)->bool { return true; };
 
   while (_running) {
