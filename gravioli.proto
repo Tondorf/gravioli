@@ -45,6 +45,13 @@ message World {
 
 
 
+message Action {
+    RotateAction rot = 1;
+    FireAction fire = 2;
+    //...
+}
+
+
 message RotateAction {
     enum Dir {
         HALT = 0;
