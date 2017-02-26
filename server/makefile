@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-c -Wall -Wextra -std=c++11
 LDFLAGS=-levent
-SOURCES=server.cpp client.cpp logger.cpp
+SOURCES=main.cpp server.cpp client.cpp logger.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=server
 
