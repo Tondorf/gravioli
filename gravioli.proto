@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package api;
 
-message Root {
+message Message {
   optional Request request = 1;
   optional Accept accept = 2;
   optional World = 3;
