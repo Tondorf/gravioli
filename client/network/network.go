@@ -5,7 +5,7 @@ import "strconv"
 
 //import "github.com/golang/protobuf/proto"
 import (
-	"../api"
+	"github.com/Tondorf/gravioli/client/api"
 	"fmt"
 	"github.com/golang/protobuf/proto"
 	"log"
