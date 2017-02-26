@@ -1,6 +1,6 @@
 CC=g++
 CFLAGS=-c -Wall -Wextra -std=c++11
-LDFLAGS=-levent
+LDFLAGS=-levent -lprotobuf
 SOURCES=main.cpp server.cpp client.cpp logger.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=server
