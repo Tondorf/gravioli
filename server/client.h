@@ -19,8 +19,14 @@ public:
   static std::shared_ptr<Client> create(bufferevent *);
 
   Client(std::size_t id, bufferevent *);
+
   virtual ~Client();
 
   void fillInbox(const std::vector<std::uint8_t> &);
+
+  bool isInboxEmpty() const;
+
+  std::vector<std::uint8_t> handOverInbox();
+
   void send(const std::vector<std::uint8_t> &);
 };

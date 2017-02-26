@@ -19,6 +19,17 @@ void Client::fillInbox(const std::vector<std::uint8_t> &data) {
   _inbox = data;
 }
 
+bool Client::isInboxEmpty() const {
+  return _inbox.size() == 0;
+}
+
+std::vector<std::uint8_t> Client::handOverInbox() {
+  std::vector<std::uint8_t> inbox;
+  inbox.swap(_inbox);
+
+  return inbox;
+}
+
 void Client::send(const std::vector<std::uint8_t> &data) {
   bufferevent_write(_bufev, &data[0], data.size());
 }

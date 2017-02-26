@@ -29,7 +29,7 @@ void onRead(bufferevent *bufev, void *arg) {
   } while(n > 0);
 
   auto id = static_cast<int *>(arg);
-  Server::getInstance().msgForClient(data, *id);
+  Server::getInstance().msgFromClientToServer(data, *id);
 
   Log::debug("Received data from client %d.", *id);
 }

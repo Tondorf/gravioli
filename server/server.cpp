@@ -8,7 +8,6 @@
 
 #include "gravioli.pb.h"
 
-
 Server &Server::getInstance() {
   static Server instance;
   return instance;
@@ -34,6 +33,18 @@ void Server::stop() {
 
 void Server::addClient(std::shared_ptr<Client> client) {
   _clients[client->ID] = client;
+
+  auto acc = new api::Accept;
+  acc->set_id(client->ID);
+
+  auto msg = new api::Message;
+  msg->set_allocated_accept(acc);
+  assert(msg->IsInitialized());
+
+  std::stringstream ss;
+  msg->SerializeToOstream(&ss);
+  auto datastring = ss.str();
+  client->send(std::vector<std::uint8_t>(datastring.begin(), datastring.end()));
 }
 
 void Server::removeClient(std::size_t id) {
@@ -50,7 +61,7 @@ bool Server::getClient(std::size_t id, std::shared_ptr<Client> &client) {
   return true;
 }
 
-void Server::msgForClient(const std::vector<std::uint8_t> &data, std::size_t id) {
+void Server::msgFromClientToServer(const std::vector<std::uint8_t> &data, std::size_t id) {
   std::shared_ptr<Client> client;
   if (getClient(id, client)) {
     client->fillInbox(data);
@@ -128,6 +139,13 @@ void Server::loop() {
   while (_running) {
     auto start = std::chrono::system_clock::now();
 
+    forAllClients([this](Client &client) {
+      if (!client.isInboxEmpty()) {
+        auto msg = client.handOverInbox();
+        processMsgFromClient(client.ID, msg);
+      }
+    });
+
     send(std::vector<std::uint8_t>(datastring.begin(), datastring.end()), all);
 
     auto stop = std::chrono::system_clock::now();
@@ -138,5 +156,14 @@ void Server::loop() {
     } else {
       Log::warning("Calculation in game loop took more time than allowed.");
     }
+  }
+}
+
+void Server::processMsgFromClient(std::size_t, const std::vector<std::uint8_t> &) {
+}
+
+void Server::forAllClients(std::function<void(Client &)> f) {
+  for (auto kv : _clients) {
+    f(*(kv.second));
   }
 }
