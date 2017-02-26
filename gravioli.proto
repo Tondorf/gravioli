@@ -63,10 +63,6 @@ message FireAction {
     required Projectile firing = 1;
 }
 
-message PerksInfo {
-    map<string, string> perks = 1; // id → description
-}
-
 message PerkPurchaseAction {
     required string perk = 1;
 }
