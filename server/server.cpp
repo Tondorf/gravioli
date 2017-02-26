@@ -1,95 +1,88 @@
-#include <arpa/inet.h>
-#include <cstdint>
-#include <cstdlib>
+#include <csignal>
 #include <cstring>
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
-#include <fcntl.h>
-#include <memory>
-#include <netinet/in.h>
-#include <unistd.h>
-#include <signal.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/socket.h>
+#include <map>
+#include <vector>
 
-#include <event2/event.h>
-#include <event2/event_struct.h>
+#include <arpa/inet.h>
+
+#include <event2/listener.h>
 #include <event2/bufferevent.h>
 #include <event2/buffer.h>
 
-event_base *evbase;
+#include "client.h"
+#include "logger.h"
 
-struct Client {
-  int fd;
-  bufferevent *bufev;
-};
+std::map<std::size_t, std::shared_ptr<Client>> clients;
 
-int setnonblock(int fd) {
-  int flags = fcntl(fd, F_GETFL);
-  if (flags < 0) {
-    return flags;
-  }
+void onRead(bufferevent *bufev, void *arg) {
+  auto id = static_cast<int *>(arg);
+  auto client = clients[*id];
 
-  flags |= O_NONBLOCK;
-  if (fcntl(fd, F_SETFL, flags) < 0) {
-    return -1;
-  }
+  std::vector<std::uint8_t> data;
 
-  return 0;
-}
-
-void onRead(bufferevent *bufev, void *) {
-  std::uint8_t chunk[8192]; // read 8k at a time
   std::size_t n = 0;
   do {
+    std::uint8_t chunk[1024];
     n = bufferevent_read(bufev, chunk, sizeof(chunk));
+
+    std::size_t size = data.size();
+    data.resize(size + n);
+    memcpy(&data[size], chunk, n);
   } while(n > 0);
+  client->setInbox(data);
+
+  Log::debug("Received data from client %d.", client->ID);
+
+  std::vector<std::uint8_t> outdata = {'f', 'o', 'o', 'b', 'a', 'r'};
+  client->send(outdata);
 }
 
-void onError(bufferevent *, short what, void *arg) {
-  if (what & BEV_EVENT_EOF) {
-    std::cout << "[LOG] client disconnected" << std::endl;
-  } else {
-    std::cout << "[LOG] client socket error, disconnecting" << std::endl;
+void onEvent(bufferevent *bufev, short what, void *arg) {
+  auto id = static_cast<int *>(arg);
+  auto client = clients[*id];
+
+  if (what & (BEV_EVENT_EOF | BEV_EVENT_ERROR)) {
+    bufferevent_free(bufev);
+
+    Log::info("Client %d disconnected.", client->ID);
   }
 
-  auto client = static_cast<Client *>(arg);
-  bufferevent_free(client->bufev);
-  close(client->fd);
-  delete client;
+  clients.erase(*id);
+  delete id;
 }
 
-void onAccept(int fd, short, void *) {
-  sockaddr_in addr;
-  socklen_t len = sizeof(addr);
+void onAccept(evconnlistener *listener, evutil_socket_t fd, sockaddr *, int, void *) {
+  event_base *base = evconnlistener_get_base(listener);
+  bufferevent *bufev = bufferevent_socket_new(base, fd, BEV_OPT_CLOSE_ON_FREE);
 
-  int clientfd = accept(fd, (sockaddr *)&addr, &len);
-  if (clientfd < 0) {
-    std::cerr << "[LOG] accept failed" << std::endl;
-    return;
-  }
+  auto client = Client::create(bufev);
+  auto id = new std::size_t;
+  *id = client->ID;
+  clients[*id] = client;
 
-  if (setnonblock(clientfd) < 0) {
-    std::cerr << "[LOG] failed to set client socket non-blocking" << std::endl;
-    return;
-  }
+  bufferevent_setcb(bufev, onRead, nullptr, onEvent, static_cast<void *>(id));
+  bufferevent_enable(bufev, EV_READ | EV_WRITE);
 
-  auto client = new Client;
-  client->fd = clientfd;
-  client->bufev = bufferevent_socket_new(evbase, clientfd, 0);
-  bufferevent_setcb(client->bufev, onRead, nullptr, onError, client);
-  bufferevent_enable(client->bufev, EV_READ);
-
-  std::cout << "[LOG] accepted connection from " << inet_ntoa(addr.sin_addr) << std::endl;
+  Log::info("Accepting new Client and assigning ID %d.", client->ID);
 }
 
+void onError(evconnlistener *listener, void *) {
+  event_base *base = evconnlistener_get_base(listener);
+  int err = EVUTIL_SOCKET_ERROR();
+
+  Log::error("Got an error %d (%s) on the listener. Shutting down.", err, evutil_socket_error_to_string(err));
+
+  event_base_loopexit(base, nullptr);
+}
 
 void onSignal(evutil_socket_t, short, void *arg) {
 	event_base *base = static_cast<event_base *>(arg);
 	timeval delay = { 2, 0 };
 
-	std::cout << "[LOG] caught an interrupt signal; exiting cleanly in two seconds" << std::endl;
+  Log::info("Caught an interrupt signal; exiting cleanly in two seconds.");
 
 	event_base_loopexit(base, &delay);
 }
@@ -110,53 +103,38 @@ int main(int argc, char **argv) {
   }
   std::cout << std::endl;
 
+  Log::SimpleLogger::getInstance().setLogLevel(Log::LogLevel::DEBUG);
+  Log::debug("Setting log level to DEBUG");
+
   std::uint16_t port = atoi(argv[1]);
-  std::cout << "starting server on port " << port << std::endl;
+  Log::info("Starting server on port %d.", port);
 	
-  evbase = event_base_new();
-  int listenfd = socket(AF_INET, SOCK_STREAM, 0);
-  if (listenfd < 0) {
-    std::cerr << "[LOG] listen failed" << std::endl;
+  auto base = event_base_new();
+
+  sockaddr_in sin;
+  std::memset(&sin, 0, sizeof(sin));
+  sin.sin_family = AF_INET;
+  sin.sin_addr.s_addr = htonl(0x7f000001);
+  sin.sin_port = htons(port);
+
+  auto flags = LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE;
+  auto listener = evconnlistener_new_bind(base, onAccept, nullptr, flags, -1, (sockaddr*)&sin, sizeof(sin));
+  if (!listener) {
+    Log::error("Could not create listener");
     return EXIT_FAILURE;
   }
 
-  sockaddr_in addr;
-  std::memset(&addr, 0, sizeof(addr));
-  addr.sin_family = AF_INET;
-  addr.sin_addr.s_addr = INADDR_ANY;
-  addr.sin_port = htons(port);
+  evconnlistener_set_error_cb(listener, onError);
 
-  if (bind(listenfd, (sockaddr *)&addr, sizeof(addr)) < 0) {
-    std::cerr << "[LOG] bind failed" << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  if (listen(listenfd, 5) < 0) {
-    std::cerr << "[LOG] listen failed" << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  int reuseaddr_on = 1;
-  setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &reuseaddr_on, sizeof(reuseaddr_on));
-
-  if (setnonblock(listenfd) < 0) {
-    std::cerr << "failed to set server socket to non-blocking" << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  event evacc;
-  event_assign(&evacc, evbase, listenfd, EV_READ | EV_PERSIST, onAccept, nullptr);
-  event_add(&evacc, nullptr);
-
-  event *evsig = evsignal_new(evbase, SIGINT, onSignal, (void *)evbase);
+  auto evsig = evsignal_new(base, SIGINT, onSignal, (void *)base);
   event_add(evsig, nullptr);
 
-  event_base_dispatch(evbase);
+  event_base_dispatch(base);
 
+  evconnlistener_free(listener);
 	event_free(evsig);
-	event_base_free(evbase);
 
-	std::cout << "[LOG] done" << std::endl;
+  Log::info("Done.");
 
   return EXIT_SUCCESS;
 }
