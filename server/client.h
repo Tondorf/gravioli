@@ -21,6 +21,6 @@ public:
   Client(std::size_t id, bufferevent *);
   virtual ~Client();
 
-  void setInbox(std::vector<std::uint8_t> &);
-  void send(std::vector<std::uint8_t> &);
+  void setInbox(const std::vector<std::uint8_t> &);
+  void send(const std::vector<std::uint8_t> &);
 };

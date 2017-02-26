@@ -3,7 +3,6 @@
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
-#include <map>
 #include <vector>
 
 #include <arpa/inet.h>
@@ -14,12 +13,53 @@
 
 #include "client.h"
 #include "logger.h"
+#include "server.h"
 
-std::map<std::size_t, std::shared_ptr<Client>> clients;
+Server &Server::getInstance() {
+  static Server instance;
+  return instance;
+}
+
+Server::Server() {
+}
+
+Server::~Server() {
+}
+
+void Server::addClient(std::shared_ptr<Client> client) {
+  _clients[client->ID] = client;
+}
+
+void Server::removeClient(std::size_t id) {
+  _clients.erase(id);
+}
+
+bool Server::getClient(std::size_t key, std::shared_ptr<Client> &client) {
+  if (_clients.count(key) == 0) {
+    client == nullptr;
+    return false;
+  }
+
+  client = _clients[key];
+  return true;
+}
+
+void Server::send(const std::vector<std::uint8_t> &msg, std::function<bool(const Client &)> filter) {
+  for (auto kv : _clients) {
+    auto client = kv.second;
+    if (filter(*client)) {
+      client->send(msg);
+    }
+  }
+}
 
 void onRead(bufferevent *bufev, void *arg) {
   auto id = static_cast<int *>(arg);
-  auto client = clients[*id];
+  std::shared_ptr<Client> client;
+  if (!Server::getInstance().getClient(*id, client)) {
+    Log::error("Could not find Client %d", *id);
+    return;
+  }
 
   std::vector<std::uint8_t> data;
 
@@ -35,14 +75,15 @@ void onRead(bufferevent *bufev, void *arg) {
   client->setInbox(data);
 
   Log::debug("Received data from client %d.", client->ID);
-
-  std::vector<std::uint8_t> outdata = {'f', 'o', 'o', 'b', 'a', 'r'};
-  client->send(outdata);
 }
 
 void onEvent(bufferevent *bufev, short what, void *arg) {
   auto id = static_cast<int *>(arg);
-  auto client = clients[*id];
+  std::shared_ptr<Client> client;
+  if (!Server::getInstance().getClient(*id, client)) {
+    Log::error("Could not find Client %d", *id);
+    return;
+  }
 
   if (what & (BEV_EVENT_EOF | BEV_EVENT_ERROR)) {
     bufferevent_free(bufev);
@@ -50,7 +91,7 @@ void onEvent(bufferevent *bufev, short what, void *arg) {
     Log::info("Client %d disconnected.", client->ID);
   }
 
-  clients.erase(*id);
+  Server::getInstance().removeClient(*id);
   delete id;
 }
 
@@ -61,7 +102,7 @@ void onAccept(evconnlistener *listener, evutil_socket_t fd, sockaddr *, int, voi
   auto client = Client::create(bufev);
   auto id = new std::size_t;
   *id = client->ID;
-  clients[*id] = client;
+  Server::getInstance().addClient(client);
 
   bufferevent_setcb(bufev, onRead, nullptr, onEvent, static_cast<void *>(id));
   bufferevent_enable(bufev, EV_READ | EV_WRITE);
