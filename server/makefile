@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-c -Wall -Wextra -std=c++11
 LDFLAGS=-levent -lprotobuf -lpthread
-SOURCES=main.cpp server.cpp client.cpp logger.cpp
+SOURCES=main.cpp server.cpp client.cpp logger.cpp gravioli.pb.cc
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=server
 
