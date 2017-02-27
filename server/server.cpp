@@ -5,6 +5,7 @@
 #include "client.h"
 #include "logger.h"
 #include "server.h"
+#include "world.h"
 
 Server &Server::getInstance() {
   static Server instance;
@@ -29,7 +30,11 @@ void Server::stop() {
   google::protobuf::ShutdownProtobufLibrary();
 }
 
-void Server::addClient(std::shared_ptr<Client> client) {
+bool Server::addClient(std::shared_ptr<Client> client) {
+  if (!world::World::getInstance().addPlayer(client->ID)) {
+    return false;
+  }
+
   _clients[client->ID] = client;
 
   auto acc = new api::Accept;
@@ -39,6 +44,8 @@ void Server::addClient(std::shared_ptr<Client> client) {
   msg->set_allocated_accept(acc);
   assert(msg->IsInitialized());
   client->send(serializeMessage(msg));
+
+  return true;
 }
 
 void Server::removeClient(std::size_t id) {
@@ -74,70 +81,24 @@ void Server::send(const std::vector<std::uint8_t> &msg, std::function<bool(const
 void Server::loop() {
   Log::debug("Starting game loop.");
   
-  auto world = new api::World;
-  auto planet = world->add_planets();
-  auto shot = world->add_shots();
-  auto player = world->add_players();
-
-  assert(planet != nullptr);
-  assert(shot != nullptr);
-  assert(player != nullptr);
-
-  auto sphere1 = new api::Sphere;
-  sphere1->set_x(0.);
-  sphere1->set_y(0.);
-  sphere1->set_mass(1e3);
-  sphere1->set_radius(10);
-  assert(sphere1->IsInitialized());
-
-  planet->set_id(0);
-  planet->set_allocated_sphere(sphere1);
-  planet->set_health(10.);
-  assert(planet->IsInitialized());
-
-  auto sphere2 = new api::Sphere;
-  sphere2->set_x(20.);
-  sphere2->set_y(30.);
-  sphere2->set_mass(.1);
-  sphere2->set_radius(.5);
-  assert(sphere2->IsInitialized());
-
-  shot->set_id(0);
-  shot->set_origin(0);
-  shot->set_allocated_sphere(sphere2);
-  shot->set_dir(3.14159/2.);
-  shot->set_speed(11.);
-  shot->set_ttl(2.);
-  shot->set_dmg(1.);
-  assert(shot->IsInitialized());
-
-  player->set_id(0);
-  player->set_name("Muttermundkontaktbolzen");
-  player->set_skillpoints(0);
-  player->set_homebaseid(0);
-  player->set_aim(3.14159);
-  player->set_cooldown(1.);
-  assert(player->IsInitialized());
-
-  assert(world->IsInitialized());
-  auto message = new api::Message;
-  message->set_allocated_world(world);
-  assert(message->IsInitialized());
-  auto serializedWorld = serializeMessage(message);
-
   auto all =  [](const Client &)->bool { return true; };
 
   while (_running) {
     auto start = std::chrono::system_clock::now();
 
-    forAllClients([this](Client &client) {
-      if (!client.isInboxEmpty()) {
-        auto msg = client.handOverInbox();
-        processMsgFromClient(client.ID, msg);
-      }
-    });
+    if (_clients.size() > 0) {
+      auto msg = dumpWorld();
+      auto serializedWorld = serializeMessage(msg);
 
-    send(serializedWorld, all);
+      forAllClients([this](Client &client) {
+        if (!client.isInboxEmpty()) {
+          auto msg = client.handOverInbox();
+          processMsgFromClient(client.ID, msg);
+        }
+      });
+
+      send(serializedWorld, all);
+    }
 
     auto stop = std::chrono::system_clock::now();
     auto dt = static_cast<std::size_t>(std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count());
@@ -165,4 +126,49 @@ std::vector<std::uint8_t> Server::serializeMessage(api::Message *msg) {
 
   std::string datastring = ss.str();
   return std::vector<std::uint8_t>(datastring.begin(), datastring.end());
+}
+
+api::Message *Server::dumpWorld() {
+  auto world = new api::World;
+
+  for (auto kv : world::World::getInstance().getPlanets()) {
+    auto id = kv.first;
+    auto planet = kv.second;
+
+    auto planet_pb = world->add_planets();
+    auto sphere_pb = new api::Sphere;
+
+    sphere_pb->set_x(planet->x);
+    sphere_pb->set_y(planet->y);
+    sphere_pb->set_mass(planet->mass);
+    sphere_pb->set_radius(planet->radius);
+    assert(sphere_pb->IsInitialized());
+
+    planet_pb->set_id(id);
+    planet_pb->set_allocated_sphere(sphere_pb);
+    planet_pb->set_health(planet->health);
+    assert(planet_pb->IsInitialized());
+  }
+
+  for (auto kv : world::World::getInstance().getPlayers()) {
+    auto id = kv.first;
+    auto player = kv.second;
+
+    auto player_pb = world->add_players();
+
+    player_pb->set_id(id);
+    player_pb->set_name(player->name);
+    player_pb->set_skillpoints(player->skillpoints);
+    player_pb->set_homebaseid(player->homebase->id);
+    player_pb->set_aim(player->aim);
+    player_pb->set_cooldown(player->cooldown);
+    assert(player_pb->IsInitialized());
+  }
+
+  assert(world->IsInitialized());
+  auto message = new api::Message;
+  message->set_allocated_world(world);
+  assert(message->IsInitialized());
+
+  return message;
 }

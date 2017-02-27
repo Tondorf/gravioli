@@ -59,7 +59,11 @@ void onAccept(evconnlistener *listener, evutil_socket_t fd, sockaddr *, int, voi
   auto client = Client::create(bufev);
   auto id = new std::size_t;
   *id = client->ID;
-  Server::getInstance().addClient(client);
+
+  if (!Server::getInstance().addClient(client)) {
+    Log::error("Could not add client.");
+    return;
+  }
 
   bufferevent_setcb(bufev, onRead, nullptr, onEvent, static_cast<void *>(id));
   bufferevent_enable(bufev, EV_READ | EV_WRITE);

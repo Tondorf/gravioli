@@ -22,6 +22,8 @@ private:
 
   std::vector<std::uint8_t> serializeMessage(api::Message *);
 
+  api::Message *dumpWorld();
+
 public:
   ~Server();
 
@@ -33,7 +35,7 @@ public:
 
   void stop();
 
-  void addClient(std::shared_ptr<Client>);
+  bool addClient(std::shared_ptr<Client>);
 
   void removeClient(std::size_t);
 
