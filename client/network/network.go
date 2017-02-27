@@ -9,8 +9,12 @@ import (
 	"fmt"
 	"github.com/golang/protobuf/proto"
 	"log"
+//	"io"
 	//"io/ioutil"
 	"time"
+	//"bufio"
+	//"net/textproto"
+	"encoding/binary"
 )
 
 func Connect(server string, port int, w chan *api.World) error {
@@ -29,29 +33,40 @@ func Connect(server string, port int, w chan *api.World) error {
 
 func fetchWorldForever(conn net.Conn, w chan<- *api.World) {
 	log.Println("fetchWorldForever()")
-	gmsg := &api.GravioliMessage{}
-	for {
-		bytes := make([]byte, 1024)
-		var err error
-		//bytes, err = ioutil.ReadAll(conn)
-		n, err := conn.Read(bytes)
-		if err != nil {
-			log.Fatalln("Failed to ReadAll from con:", err)
-		} else {
-			log.Println("Received", n, "bytes:", bytes)
-		}
-		if err := proto.Unmarshal(bytes, gmsg); err != nil {
-			log.Fatalln("Failed to Unmarshal:", err)
-		} else {
-			log.Println("Unmarshalled:", gmsg)
-		}
-		if gmsg.World != nil {
-			w <- gmsg.World
-		} else {
-			log.Println("No world received with gravioli message")
-		}
-		time.Sleep(time.Second)
+
+
+	lenbytes := make([]byte, 4)
+	n, err := conn.Read(lenbytes)
+	if err != nil {
+		log.Fatalln("Failed to Read from con:", err)
 	}
+	if n != 4 {
+		log.Fatalln("Expected 4 len bytes, got", n)
+	}
+	protolen := binary.BigEndian.Uint32(lenbytes)
+
+	protobytes := make([]byte, protolen)
+	n, err = conn.Read(protobytes)
+	if err != nil {
+		log.Fatalln("Failed to Read from con:", err)
+	}
+	if n != int(protolen) {
+		log.Fatalln("Expected", protolen, "bytes, got", n)
+	}
+
+	gmsg := &api.GravioliMessage{}
+	if err := proto.Unmarshal(protobytes[:n], gmsg); err != nil {
+		log.Fatalln("Failed to Unmarshal:", err)
+	} else {
+		log.Println("Unmarshalled:", gmsg)
+	}
+	if gmsg.World != nil {
+		w <- gmsg.World
+	} else {
+		log.Println("No world received with gravioli message")
+	}
+	time.Sleep(time.Second)
+
 }
 
 //func sendInputsForever(conn net.Conn, act chan ...) {
