@@ -9,36 +9,45 @@ import (
 	"fmt"
 	"github.com/golang/protobuf/proto"
 	"log"
+	//"time"
+	"io/ioutil"
+	"time"
 )
 
 func Connect(server string, port int, w chan *api.World) error {
-    conn, err := net.Dial("tcp", server+":"+strconv.Itoa(port))
-    if err != nil {
+	conn, err := net.Dial("tcp", server+":"+strconv.Itoa(port))
+	if err != nil {
 		fmt.Println("Connection error:", err)
 		return err
 	}
-	defer conn.Close()
+	//defer conn.Close()
 	go fetchWorldForever(conn, w)
 	//sendInputsForever(conn, )
 	return nil
 }
 
-func fetchWorldForever(conn net.Conn, w chan *api.World) {
-	world := &api.World{}
-	var bytes []byte
+func fetchWorldForever(conn net.Conn, w chan<- *api.World) {
+	gmsg := &api.GravioliMessage{}
 	for {
-		if _, err := conn.Read(bytes); err != nil {
-			log.Fatalln("Failed to Read from con:", err)
+		var bytes []byte
+		var err error
+		if bytes, err = ioutil.ReadAll(conn); err != nil {
+			log.Fatalln("Failed to ReadAll from con:", err)
 		}
-		if err := proto.Unmarshal(bytes, world); err != nil {
+		if err := proto.Unmarshal(bytes, gmsg); err != nil {
 			log.Fatalln("Failed to Unmarshal:", err)
 		}
-		w <- world
+		if gmsg.World != nil {
+			w <- gmsg.World
+		} else {
+			log.Println("No world received with gravioli message")
+		}
+		time.Sleep(1)
 	}
 }
 
-func sendInputsForever(conn net.Conn, act chan proto.Marshaler) {
-	for {
-
-	}
-}
+//func sendInputsForever(conn net.Conn, act chan ...) {
+//	for {
+//		time.Sleep(1)
+//	}
+//}
