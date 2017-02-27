@@ -15,6 +15,9 @@ Server &Server::getInstance() {
 Server::Server() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
+  // generate world
+  world::World::getInstance();
+
   _thread = std::make_shared<std::thread>(&Server::loop, this);
   _running = true;
 }

@@ -49,6 +49,8 @@ namespace world {
 
     World();
 
+    void generateWorld(std::size_t nPlanets, std::size_t seed);
+
   public:
     virtual ~World();
 

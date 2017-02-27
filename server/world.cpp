@@ -2,6 +2,7 @@
 #include <cmath>
 #include <set>
 
+#include "logger.h"
 #include "world.h"
 
 namespace world {
@@ -11,23 +12,7 @@ namespace world {
   }
 
   World::World() : _nextShotID(0) {
-    auto planet = std::make_shared<Planet>();
-    planet->id = 0;
-    planet->health = 1.;
-    planet->x = 0.;
-    planet->y = 0.;
-    planet->mass = 1e3;
-    planet->radius = 10.;
-    _planets[planet->id] = planet;
-
-    auto planet2 = std::make_shared<Planet>();
-    planet2->id = 1;
-    planet2->health = 1.;
-    planet2->x = 200.;
-    planet2->y = -300.;
-    planet2->mass = 1e3;
-    planet2->radius = 10.;
-    _planets[planet2->id] = planet2;
+    generateWorld(10, 0);
   }
 
   World::~World() {
@@ -89,6 +74,47 @@ namespace world {
     _shots[id] = shot;
 
     return true;
+  }
+
+  void World::generateWorld(std::size_t nPlanets, std::size_t seed) {
+    Log::info("Generating world with %d planets.", nPlanets);
+
+    std::size_t id = 0;
+
+    srand(seed);
+    for (std::size_t i = 0; i < nPlanets; i++) {
+      int x;
+      int y;
+      double r;
+      bool collision = false;
+      do {
+        x = rand() % 1000;
+        y = rand() % 1000;
+        r = 10.;
+
+        for (auto kv : _planets) {
+          auto planet = kv.second;
+          double dx = x - planet->x;
+          double dy = y - planet->y;
+          auto dist2 = dx * dx + dy * dy;
+          if (2. * dist2 < r * planet->radius) {
+            collision = true;
+            break;
+          }
+        }
+      } while (collision);
+
+      auto planet = std::make_shared<Planet>();
+      planet->id = id;
+      planet->health = 1.;
+      planet->x = (double) x;
+      planet->y = (double) y;
+      planet->mass = 1e3;
+      planet->radius = r;
+      _planets[planet->id] = planet;
+
+      id += 1;
+    }
   }
 
   const std::map<std::size_t, std::shared_ptr<Planet>> &World::getPlanets() const {
