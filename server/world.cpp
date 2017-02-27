@@ -18,8 +18,16 @@ namespace world {
     planet->y = 0.;
     planet->mass = 1e3;
     planet->radius = 10.;
-
     _planets[planet->id] = planet;
+
+    auto planet2 = std::make_shared<Planet>();
+    planet2->id = 1;
+    planet2->health = 1.;
+    planet2->x = 200.;
+    planet2->y = -300.;
+    planet2->mass = 1e3;
+    planet2->radius = 10.;
+    _planets[planet2->id] = planet2;
   }
 
   World::~World() {
