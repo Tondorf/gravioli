@@ -2,20 +2,24 @@ syntax = "proto2";
 
 package api;
 
-message Message {
-  optional Request request = 1;
-  optional Accept accept = 2;
+
+message GravioliMessage {
+  optional Registration request = 1;
+  optional Acceptance accept = 2;
   optional World world = 3;
   optional Action action = 4;
 }
 
-message Request {
-    required string name = 1;
+
+message Registration {
+    required string name = 1; // empty string = just visualizer
 }
 
-message Accept {
-    required uint32 id = 1;
+
+message Acceptance {
+    required uint32 id = 1; // player id
 }
+
 
 message Sphere {
     required double x = 1;
@@ -55,9 +59,12 @@ message World {
     repeated Player players = 3;
 }
 
+
 message Action {
-    required RotateAction rot = 1;
-    required FireAction fire = 2;
+    optional RotateAction rot = 1;
+    optional FireAction fire = 2;
+    optional PerkPurchaseAction perk = 3;
+    optional GunsightPositioningAction gun = 4;
 }
 
 message RotateAction {
@@ -85,4 +92,3 @@ message PerkPurchaseAction {
 message GunsightPositioningAction {
     required double position = 1; // radian
 }
-
