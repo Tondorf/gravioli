@@ -2,7 +2,6 @@ syntax = "proto2";
 
 package api;
 
-
 message GravioliMessage {
   optional Registration request = 1;
   optional Acceptance accept = 2;
@@ -10,16 +9,13 @@ message GravioliMessage {
   optional Action action = 4;
 }
 
-
 message Registration {
     required string name = 1; // empty string = just visualizer
 }
 
-
 message Acceptance {
     required uint32 id = 1; // player id
 }
-
 
 message Sphere {
     required double x = 1;
