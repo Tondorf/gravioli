@@ -32,6 +32,8 @@ std::vector<std::uint8_t> Client::handOverInbox() {
 
 void Client::send(const std::vector<std::uint8_t> &data) {
   std::uint32_t length = data.size();
+  
+  // converting e.g. 256 -> 0010
   std::uint8_t arrayOfBytes[4];
   for (int i = 0; i < 4; i++) {
     arrayOfBytes[3 - i] = (length >> (i * 8));
