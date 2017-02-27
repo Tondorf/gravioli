@@ -31,5 +31,7 @@ std::vector<std::uint8_t> Client::handOverInbox() {
 }
 
 void Client::send(const std::vector<std::uint8_t> &data) {
+  std::uint8_t length = data.size();
+  bufferevent_write(_bufev, &length, 1);
   bufferevent_write(_bufev, &data[0], data.size());
 }
