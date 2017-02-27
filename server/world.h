@@ -1,8 +1,9 @@
 #pragma once
 
+#include <atomic>
 #include <memory>
-#include <string>
 #include <map>
+#include <string>
 
 
 namespace world {
@@ -24,6 +25,8 @@ namespace world {
     std::size_t skillpoints;
     std::shared_ptr<Planet> homebase;
     double aim;
+    double gunpower;
+    double gunlength;
     double cooldown;
   };
 
@@ -38,6 +41,8 @@ namespace world {
 
   class World {
   private:
+    std::atomic<std::size_t> _nextShotID;
+
     std::map<std::size_t, std::shared_ptr<Planet>> _planets;
     std::map<std::size_t, std::shared_ptr<Shot>> _shots;
     std::map<std::size_t, std::shared_ptr<Player>> _players;
@@ -56,6 +61,8 @@ namespace world {
     bool addPlayer(std::size_t id);
 
     bool nextFreePlanet(std::size_t &id);
+
+    bool playerShoots(std::shared_ptr<Player>);
 
     const std::map<std::size_t, std::shared_ptr<Planet>> &getPlanets() const;
 

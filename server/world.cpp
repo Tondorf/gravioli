@@ -1,4 +1,5 @@
 #include <cassert>
+#include <cmath>
 #include <set>
 
 #include "world.h"
@@ -9,7 +10,7 @@ namespace world {
     return instance;
   }
 
-  World::World() {
+  World::World() : _nextShotID(0) {
     auto planet = std::make_shared<Planet>();
     planet->id = 0;
     planet->health = 1.;
@@ -60,6 +61,26 @@ namespace world {
     }
 
     return false;
+  }
+
+  bool World::playerShoots(std::shared_ptr<Player> player) {
+    if (player->cooldown > 0) {
+      return false;
+    }
+
+    auto shot = std::make_shared<Shot>();
+    std::size_t id = _nextShotID;
+    _nextShotID = id + 1;
+    shot->id = id;
+    shot->origin = player;
+    shot->vx = player->gunlength * sin(player->aim);
+    shot->vy = player->gunlength * cos(player->aim);
+    shot->ttl = 5.;
+    shot->dmg = 1.;
+
+    _shots[id] = shot;
+
+    return true;
   }
 
   const std::map<std::size_t, std::shared_ptr<Planet>> &World::getPlanets() const {
