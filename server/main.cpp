@@ -92,11 +92,6 @@ void onSignal(evutil_socket_t, short, void *arg) {
 }
 
 int main(int argc, char **argv) {
-  if (argc != 2) {
-    std::cerr << "Usage: " << argv[0] << " [port]" << std::endl;
-    return EXIT_FAILURE;
-  }
-
   std::ifstream splashfile("splash.txt"); 
   if (splashfile.is_open()) {
     std::string line;
@@ -113,7 +108,13 @@ int main(int argc, char **argv) {
   // start server
   Server::getInstance();
 
-  std::uint16_t port = atoi(argv[1]);
+  std::uint16_t port;
+  if (argc == 2) {
+    port = atoi(argv[1]);
+  } else {
+    port = 2017;
+  }
+
   Log::info("Starting server on port %d.", port);
 	
   auto base = event_base_new();
