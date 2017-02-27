@@ -31,7 +31,8 @@ message Player {
     required uint32 homebaseID  = 4; // reference to Planet.id
     required double aim         = 5; // in radian (0 - 2pi)
     required double gunpower    = 6; // in radian (0 - 2pi)
-    required double cooldown    = 7; // remaining time in seconds
+    required double gunlength   = 7; // shots will spawn at this height
+    required double cooldown    = 8; // remaining time in seconds
 }
 
 message Shot {
