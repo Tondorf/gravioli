@@ -161,6 +161,8 @@ api::GravioliMessage *Server::dumpWorld() {
     player_pb->set_skillpoints(player->skillpoints);
     player_pb->set_homebaseid(player->homebase->id);
     player_pb->set_aim(player->aim);
+    player_pb->set_gunpower(player->gunpower);
+    player_pb->set_gunlength(player->gunlength);
     player_pb->set_cooldown(player->cooldown);
     assert(player_pb->IsInitialized());
   }
