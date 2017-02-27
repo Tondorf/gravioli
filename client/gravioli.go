@@ -29,7 +29,7 @@ func main() {
 	go visualizer.Init(worldChan)
 
 	for {
-		time.Sleep(1)
+		time.Sleep(time.Second)
 	}
 
 }

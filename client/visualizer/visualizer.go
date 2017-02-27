@@ -19,7 +19,7 @@ func run(worldchan <-chan *api.World) {
 	for {
 		world := <-worldchan
 		draw(world)
-		time.Sleep(100)
+		time.Sleep(time.Second)
 	}
 }
 
