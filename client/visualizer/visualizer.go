@@ -3,7 +3,7 @@ package visualizer
 import (
 	//"github.com/veandco/go-sdl2/sdl"
 	"github.com/Tondorf/gravioli/client/api"
-	"time"
+	//"time"
 )
 
 //const window *sdl.Window
@@ -19,12 +19,11 @@ func run(worldchan <-chan *api.World) {
 	for {
 		world := <-worldchan
 		draw(world)
-		time.Sleep(time.Second)
 	}
 }
 
 func draw(world *api.World) {
-	println(world.Planets)
+	//println(world.Planets)
 }
 
 //func WindowTest() {
