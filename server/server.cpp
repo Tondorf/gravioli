@@ -114,7 +114,16 @@ void Server::loop() {
   }
 }
 
-void Server::processMsgFromClient(std::size_t, const std::vector<std::uint8_t> &) {
+void Server::processMsgFromClient(std::size_t, const std::vector<std::uint8_t> &msg) {
+  auto message = new api::GravioliMessage;
+
+  std::stringstream datastream;
+  datastream.write((char *) &msg[0], msg.size());
+  message->ParseFromIstream(&datastream); 
+
+  /*
+   * TODO
+   */
 }
 
 void Server::forAllClients(std::function<void(Client &)> f) {
