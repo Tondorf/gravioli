@@ -37,10 +37,10 @@ bool Server::addClient(std::shared_ptr<Client> client) {
 
   _clients[client->ID] = client;
 
-  auto acc = new api::Accept;
+  auto acc = new api::Acceptance;
   acc->set_id(client->ID);
 
-  auto msg = new api::Message;
+  auto msg = new api::GravioliMessage;
   msg->set_allocated_accept(acc);
   assert(msg->IsInitialized());
   client->send(serializeMessage(msg));
@@ -120,7 +120,7 @@ void Server::forAllClients(std::function<void(Client &)> f) {
   }
 }
 
-std::vector<std::uint8_t> Server::serializeMessage(api::Message *msg) {
+std::vector<std::uint8_t> Server::serializeMessage(api::GravioliMessage *msg) {
   std::stringstream ss;
   msg->SerializeToOstream(&ss);
 
@@ -128,7 +128,7 @@ std::vector<std::uint8_t> Server::serializeMessage(api::Message *msg) {
   return std::vector<std::uint8_t>(datastring.begin(), datastring.end());
 }
 
-api::Message *Server::dumpWorld() {
+api::GravioliMessage *Server::dumpWorld() {
   auto world = new api::World;
 
   for (auto kv : world::World::getInstance().getPlanets()) {
@@ -166,7 +166,7 @@ api::Message *Server::dumpWorld() {
   }
 
   assert(world->IsInitialized());
-  auto message = new api::Message;
+  auto message = new api::GravioliMessage;
   message->set_allocated_world(world);
   assert(message->IsInitialized());
 

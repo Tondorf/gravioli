@@ -20,9 +20,9 @@ private:
 
   void processMsgFromClient(std::size_t, const std::vector<std::uint8_t> &);
 
-  std::vector<std::uint8_t> serializeMessage(api::Message *);
+  std::vector<std::uint8_t> serializeMessage(api::GravioliMessage *);
 
-  api::Message *dumpWorld();
+  api::GravioliMessage *dumpWorld();
 
 public:
   ~Server();
