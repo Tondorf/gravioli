@@ -32,6 +32,11 @@ std::vector<std::uint8_t> Client::handOverInbox() {
 
 void Client::send(const std::vector<std::uint8_t> &data) {
   std::uint32_t length = data.size();
-  bufferevent_write(_bufev, &length, 1);
+  std::uint8_t arrayOfBytes[4];
+  for (int i = 0; i < 4; i++) {
+    arrayOfBytes[3 - i] = (length >> (i * 8));
+  }
+
+  bufferevent_write(_bufev, arrayOfBytes, 4);
   bufferevent_write(_bufev, &data[0], data.size());
 }
