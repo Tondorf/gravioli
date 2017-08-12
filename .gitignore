@@ -31,6 +31,6 @@
 # Vim swp files
 *.swp
 
-# idea
+# IDEA
 *.iml
 .idea

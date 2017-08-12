@@ -1,48 +1,41 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.5.1)
 
-if (NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build (Debug or Release)" FORCE)
-endif ()
+#set(CMAKE_BUILD_TYPE release)
+set(CMAKE_BUILD_TYPE debug)
 
-project(gravioli)
+project(server)
 
 # set version information in a config.h file
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 1)
-set(RES_PATH "res")
 configure_file(
-    "${PROJECT_SOURCE_DIR}/config.h.in"
-    "${PROJECT_BINARY_DIR}/config.h"
+    "${PROJECT_SOURCE_DIR}/config.hpp.in"
+    "${PROJECT_BINARY_DIR}/config.hpp"
 )
+
 include_directories("${PROJECT_BINARY_DIR}")
 
+# include SimpleLogger
+include_directories(lib/SimpleLogger)
+
 # define sources and executable
-set(EXECUTABLE_NAME "gravioli")
-file(GLOB CPP_FILES src/*)
-set(SOURCE_FILES ${CPP_FILES})
+set(EXECUTABLE_NAME "server")
+set(SOURCE_FILES src/main.cxx
+                 src/server/server.hpp)
 add_executable(${EXECUTABLE_NAME} ${SOURCE_FILES})
 
-# include header files
-include_directories(.)
-
-# include SimpleLog
-include_directories(lib/SimpleLog)
-
-# include beast
-include_directories(lib/Beast/include)
-
-# add resources to build directory
-file(COPY res DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
-# require C++11
+# require C++14
 set_target_properties(
-    gravioli PROPERTIES
-    CXX_STANDARD 11
+    ${EXECUTABLE_NAME} PROPERTIES
+    CXX_STANDARD 14
     CXX_STANDARD_REQUIRED ON
 )
+if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE STREQUAL "debug")
+    set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -pedantic")
+endif()
 
 # add Boost library
-find_package(Boost 1.40.0 COMPONENTS program_options system REQUIRED)
+find_package(Boost COMPONENTS system thread program_options REQUIRED)
 if (Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIR})
     target_link_libraries(${EXECUTABLE_NAME} ${Boost_LIBRARIES})
@@ -54,5 +47,38 @@ if (Threads_FOUND)
     target_link_libraries(${EXECUTABLE_NAME} ${CMAKE_THREAD_LIBS_INIT})
 endif ()
 
-# install target
-install(TARGETS ${EXECUTABLE_NAME} DESTINATION bin)
+# add zeromq library
+find_library(ZMQ_LIB zmq)
+if (NOT ZMQ_LIB)
+    message(FATAL_ERROR "zeromq library not found")
+else ()
+    target_link_libraries(${EXECUTABLE_NAME} ${ZMQ_LIB})
+endif ()
+
+# add Google Testing Framework and enable testing
+find_package(GTest)
+if (GTEST_FOUND)
+    set(UNITTEST_FILES test/test_userInputParser.cpp)
+
+    set(EXECUTABLE_NAME "runAllUnitTests")
+
+    enable_testing()
+    add_executable(${EXECUTABLE_NAME} ${UNITTEST_FILES})
+    target_link_libraries(${EXECUTABLE_NAME} gtest gtest_main)
+    add_test(NAME ${EXECUTABLE_NAME} COMMAND runUnitTests)
+
+    # require C++14
+    set_target_properties(
+        ${EXECUTABLE_NAME} PROPERTIES
+        CXX_STANDARD 14
+        CXX_STANDARD_REQUIRED ON
+    )
+
+    # add Boost library
+    find_package(Boost COMPONENTS program_options REQUIRED)
+    if (Boost_FOUND)
+        include_directories(${Boost_INCLUDE_DIR})
+        target_link_libraries(${EXECUTABLE_NAME} ${Boost_LIBRARIES})
+    endif ()
+endif ()
+

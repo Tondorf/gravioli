@@ -1,0 +1,26 @@
+#pragma once
+
+constexpr unsigned int VERSION_MAJOR = @VERSION_MAJOR@;
+constexpr unsigned int VERSION_MINOR = @VERSION_MINOR@;
+
+enum class BuildType {
+    DEBUG, RELEASE
+};
+const std::string BUILD_TYPE_AS_STRING = "@CMAKE_BUILD_TYPE@";
+const BuildType BUILD_TYPE = []() {
+    if (BUILD_TYPE_AS_STRING.compare("release") == 0) {
+        return BuildType::RELEASE;
+    }
+    return BuildType::DEBUG;
+}();
+
+using port_t = std::uint16_t;
+constexpr port_t DEFAULT_PORT = 8888;
+
+constexpr std::size_t DEFAULT_THREADS = 1;
+
+constexpr char LOGDATE_LOCALE[] = "en_US.UTF8";
+constexpr char LOGDATE_FORMAT[] = "%d/%b/%Y:%H:%M:%S %z";
+
+// Buffer size of incoming data in units of type 'char'
+constexpr std::size_t BUFFER_SIZE = 1024;

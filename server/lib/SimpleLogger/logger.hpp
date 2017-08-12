@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cstdarg>
 #include <iostream>
+#include <functional>
 #include <string>
 
 namespace Log {
@@ -14,8 +15,13 @@ namespace Log {
     private:
         FILE *_out;
         LogLevel _logLevel;
+        bool _printTimestamp = false;
+        std::function<std::string(void)> _time;
 
-        SimpleLogger() : _out(stdout), _logLevel(LogLevel::INFO) {
+        SimpleLogger() :
+            _out(stdout),
+            _logLevel(LogLevel::INFO),
+            _time([]() { return ""; }) {
         }
 
     public:
@@ -40,8 +46,8 @@ namespace Log {
             return _logLevel;
         }
 
-        std::string getLogLevelAsString() const {
-            switch (_logLevel) {
+        static std::string logLevelAsString(const LogLevel level) {
+            switch (level) {
                 case LogLevel::DEBUG:
                     return "DEBUG";
                 case LogLevel::INFO:
@@ -54,23 +60,23 @@ namespace Log {
             return "UNKNOWN";
         }
 
+        void addTimestamp(const std::function<std::string(void)>& f) {
+            _printTimestamp = true;
+            _time = f;
+        }
+
+        void hideTimestamp() {
+            _printTimestamp = false;
+        }
+
         void log(const LogLevel logLevel, const char *msg, va_list args) {
             if (logLevel >= _logLevel) {
-                switch (logLevel) {
-                    case LogLevel::DEBUG:
-                        fprintf(_out, "[DEBUG] ");
-                        break;
-                    case LogLevel::INFO:
-                        fprintf(_out, "[INFO] ");
-                        break;
-                    case LogLevel::WARNING:
-                        fprintf(_out, "[WARNING] ");
-                        break;
-                    case LogLevel::ERROR:
-                        fprintf(_out, "[ERROR] ");
-                        break;
-                    default:
-                        assert(false);
+                auto logLevel_str = logLevelAsString(logLevel);
+                if (_printTimestamp) {
+                    auto formatedTime = _time();
+                    fprintf(_out, "[%s] %s", logLevel_str.c_str(), formatedTime.c_str());
+                } else {
+                    fprintf(_out, "[%s]", logLevel_str.c_str());
                 }
 
                 vfprintf(_out, msg, args);
@@ -106,4 +112,4 @@ namespace Log {
         SimpleLogger::getInstance().log(LogLevel::ERROR, msg, args);
         va_end(args);
     }
-};
+}
