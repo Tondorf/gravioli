@@ -67,7 +67,7 @@ int main(int argc, char const* argv[]) {
 
     /*
      * Server::run blocks as long as server is running.
-     * Server ist stopped by calling Server::stop.
+     * Server is stopped by calling Server::stop.
      */
     if (server.run()) {
         Log::info("Stopped server successfully.");
