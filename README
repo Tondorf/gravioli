@@ -1,0 +1,6 @@
+INSTALL PYTHON CLIENTS
+**********************
+
+We provide all requirements for the python client within the <code>requirements.txt</code> file.
+This file was obtained via <code>pip freeze</code>, thus one can use <code>pip install -r requirements.txt</code> in order to install the requirements.
+We highly encourage you to use <a href="https://virtualenv.pypa.io">virtualenv</a>.
