@@ -7,7 +7,7 @@
 #include "../src/server/crypto.hpp"
 
 
-constexpr Crypto::Key TEST_KEY = {
+constexpr crypto::Key TEST_KEY = {
     0x00, 0x01, 0x02, 0x03,
     0x04, 0x05, 0x06, 0x07,
     0x08, 0x09, 0x0a, 0x0b,
@@ -43,7 +43,7 @@ bool equal(byte *a, std::string b) {
 
 
 TEST(Key, hasValidBlockSize) { 
-    auto bs = Crypto::KEY_BLOCKSIZE;
+    auto bs = crypto::KEY_BLOCKSIZE;
     ASSERT_EQ(TEST_KEY.size(), bs);
 }
 
@@ -54,7 +54,7 @@ TEST(Encryption, isNotIdentity) {
     std::size_t nChars;
     byte *msg = allocateWithoutTrailingZero(secrete, nChars);
 
-    Crypto::encrypt(msg, nChars, TEST_KEY);
+    crypto::encrypt(msg, nChars, TEST_KEY);
     ASSERT_FALSE(equal(msg, secrete));
 
     delete msg;
@@ -67,8 +67,8 @@ TEST(EncryptionAndDecryption, withSameKeysIsIdentity) {
     std::size_t nChars;
     byte *msg = allocateWithoutTrailingZero(secrete, nChars);
 
-    auto iv = Crypto::encrypt(msg, nChars, TEST_KEY);
-    Crypto::decrypt(msg, nChars, TEST_KEY, iv);
+    auto iv = crypto::encrypt(msg, nChars, TEST_KEY);
+    crypto::decrypt(msg, nChars, TEST_KEY, iv);
 
     ASSERT_TRUE(equal(msg, secrete));
 
@@ -81,15 +81,15 @@ TEST(EncryptionAndDecryption, withDifferentKeysIsNotIdentity) {
     std::size_t nChars;
     byte *msg = allocateWithoutTrailingZero(secrete, nChars);
 
-    constexpr Crypto::Key OTHER_KEY = {
+    constexpr crypto::Key OTHER_KEY = {
         0x01, 0x01, 0x02, 0x03,
         0x04, 0x05, 0x06, 0x07,
         0x08, 0x09, 0x0a, 0x0b,
         0x0c, 0x0d, 0x0e, 0x0f
     };
 
-    auto iv = Crypto::encrypt(msg, nChars, TEST_KEY);
-    Crypto::decrypt(msg, nChars, OTHER_KEY, iv);
+    auto iv = crypto::encrypt(msg, nChars, TEST_KEY);
+    crypto::decrypt(msg, nChars, OTHER_KEY, iv);
 
     ASSERT_FALSE(equal(msg, secrete));
 
@@ -102,22 +102,22 @@ TEST(EncryptionAndDecryption, withDifferentInitialVectorIsNotIdentity) {
     std::size_t nChars;
     byte *msg = allocateWithoutTrailingZero(secrete, nChars);
 
-    constexpr Crypto::Key IV1 = {
+    constexpr crypto::Key IV1 = {
         0x00, 0x01, 0x02, 0x03,
         0x04, 0x05, 0x06, 0x07,
         0x08, 0x09, 0x0a, 0x0b,
         0x0c, 0x0d, 0x0e, 0x0f
     };
 
-    constexpr Crypto::Key IV2 = {
+    constexpr crypto::Key IV2 = {
         0x01, 0x01, 0x02, 0x03,
         0x04, 0x05, 0x06, 0x07,
         0x08, 0x09, 0x0a, 0x0b,
         0x0c, 0x0d, 0x0e, 0x0f
     };
 
-    Crypto::encrypt(msg, nChars, TEST_KEY, IV1);
-    Crypto::decrypt(msg, nChars, TEST_KEY, IV2);
+    crypto::encrypt(msg, nChars, TEST_KEY, IV1);
+    crypto::decrypt(msg, nChars, TEST_KEY, IV2);
 
     ASSERT_FALSE(equal(msg, secrete));
 
@@ -125,8 +125,8 @@ TEST(EncryptionAndDecryption, withDifferentInitialVectorIsNotIdentity) {
 }
 
 TEST(EncryptionAndDecryption, matchValuesOfTestVector) { 
-    constexpr std::size_t KEY_LENGTH = Crypto::KEY_BLOCKSIZE;
-    constexpr std::size_t IV_LENGTH = Crypto::IV_BLOCKSIZE;
+    constexpr std::size_t KEY_LENGTH = crypto::KEY_BLOCKSIZE;
+    constexpr std::size_t IV_LENGTH = crypto::IV_BLOCKSIZE;
     constexpr std::size_t PLAIN_LENGTH = 16;
 
     std::vector<std::string> prefixes {
@@ -154,10 +154,10 @@ TEST(EncryptionAndDecryption, matchValuesOfTestVector) {
 
             auto msg = t.plain;
 
-            Crypto::encrypt(&msg[0], PLAIN_LENGTH, key, iv);
+            crypto::encrypt(&msg[0], PLAIN_LENGTH, key, iv);
             ASSERT_TRUE(msg == t.cipher);
 
-            Crypto::decrypt(&msg[0], PLAIN_LENGTH, key, iv);
+            crypto::decrypt(&msg[0], PLAIN_LENGTH, key, iv);
             ASSERT_TRUE(msg == t.plain);
         }
     }

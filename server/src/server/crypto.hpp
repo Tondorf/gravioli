@@ -9,29 +9,30 @@
 #include "config.hpp"
 
 
-class Crypto {
-public:
-    static constexpr std::size_t
-    KEY_BLOCKSIZE = (CRYPTO_LEVEL == CryptoLevel::FAST) ? 16 :
-                    ((CRYPTO_LEVEL == CryptoLevel::HIGH) ? 24 : 32);
-    static constexpr std::size_t IV_BLOCKSIZE = 16;
+namespace crypto {
+    constexpr std::size_t getKeyBlockSizeFromCryptoLevel() {
+        if (CRYPTO_LEVEL == CryptoLevel::FAST) return 16;
+        if (CRYPTO_LEVEL == CryptoLevel::HIGH) return 24;
+        return 32;
+    }
+    constexpr std::size_t KEY_BLOCKSIZE = getKeyBlockSizeFromCryptoLevel();
+    constexpr std::size_t IV_BLOCKSIZE = 16;
 
     using Key = std::array<byte, KEY_BLOCKSIZE>;
     using IV = std::array<byte, IV_BLOCKSIZE>;
 
 
-    Crypto() = delete;
 
-
-    static void encrypt(byte *msg, const std::size_t msgLength, const Key& key, const IV& iv) {
+    void encrypt(byte *msg, const std::size_t msgLength, const Key& key, const IV& iv) {
         CryptoPP::CFB_Mode<CryptoPP::AES>::Encryption cfbEncryption(key.data(), key.size(), iv.data());
         cfbEncryption.ProcessData(msg, msg, msgLength);
     }
 
 
-    static IV encrypt(byte *msg, const std::size_t msgLength, const Key& key) {
+    IV encrypt(byte *msg, const std::size_t msgLength, const Key& key) {
         IV iv;
-        generateIV(iv);
+        CryptoPP::AutoSeededRandomPool rnd;
+        rnd.GenerateBlock(iv.data(), IV_BLOCKSIZE);
 
         encrypt(msg, msgLength, key, iv);
 
@@ -39,14 +40,8 @@ public:
     }
 
 
-    static void decrypt(byte *msg, const std::size_t msgLength, const Key& key, const IV& iv) {
+    void decrypt(byte *msg, const std::size_t msgLength, const Key& key, const IV& iv) {
         CryptoPP::CFB_Mode<CryptoPP::AES>::Decryption cfbDecryption(key.data(), key.size(), iv.data());
         cfbDecryption.ProcessData(msg, msg, msgLength);
     }
-
-private:
-    static void generateIV(IV& iv) {
-        CryptoPP::AutoSeededRandomPool rnd;
-        rnd.GenerateBlock(iv.data(), IV_BLOCKSIZE);
-    }
-};
+}
