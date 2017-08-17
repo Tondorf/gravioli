@@ -5,6 +5,26 @@ set(CMAKE_BUILD_TYPE debug)
 
 project(server)
 
+# Copy files from source directory to destination directory and
+# creates destination directory if it does not exist.
+macro(configure_files srcDir destDir)
+    message(STATUS "Configuring directory ${destDir}")
+    make_directory(${destDir})
+
+    file(GLOB templateFiles RELATIVE ${srcDir} ${srcDir}/*)
+    foreach(templateFile ${templateFiles})
+        set(srcTemplatePath ${srcDir}/${templateFile})
+        if(NOT IS_DIRECTORY ${srcTemplatePath})
+            message(STATUS "Configuring file ${templateFile}")
+            configure_file(
+                ${srcTemplatePath}
+                ${destDir}/${templateFile}
+                COPYONLY
+            )
+        endif(NOT IS_DIRECTORY ${srcTemplatePath})
+    endforeach(templateFile)
+endmacro(configure_files)
+
 # set version information in a config.h file
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 1)
@@ -21,7 +41,8 @@ include_directories(lib/SimpleLogger)
 # define sources and executable
 set(EXECUTABLE_NAME "server")
 set(SOURCE_FILES src/main.cxx
-                 src/server/server.hpp)
+                 src/server/server.hpp
+                 src/server/crypto.hpp)
 add_executable(${EXECUTABLE_NAME} ${SOURCE_FILES})
 
 # require C++14
@@ -55,10 +76,24 @@ else ()
     target_link_libraries(${EXECUTABLE_NAME} ${ZMQ_LIB})
 endif ()
 
+# add crypto++ library
+find_library(CRYPTOPP_LIB crypto++)
+if (NOT CRYPTOPP_LIB)
+    message(FATAL_ERROR "crypto++ library not found")
+else ()
+    target_link_libraries(${EXECUTABLE_NAME} ${CRYPTOPP_LIB})
+endif ()
+
 # add Google Testing Framework and enable testing
 find_package(GTest)
 if (GTEST_FOUND)
-    set(UNITTEST_FILES test/test_userInputParser.cpp)
+    set(UNITTEST_FILES test/test_userInputParser.cpp
+                       test/test_crypto.cpp)
+
+    configure_files(
+        "${PROJECT_SOURCE_DIR}/test/KAT_AES"
+        "${PROJECT_BINARY_DIR}/test/KAT_AES"
+    )
 
     set(EXECUTABLE_NAME "runAllUnitTests")
 
@@ -79,6 +114,14 @@ if (GTEST_FOUND)
     if (Boost_FOUND)
         include_directories(${Boost_INCLUDE_DIR})
         target_link_libraries(${EXECUTABLE_NAME} ${Boost_LIBRARIES})
+    endif ()
+
+    # add crypto++ library
+    find_library(CRYPTOPP_LIB crypto++)
+    if (NOT CRYPTOPP_LIB)
+        message(FATAL_ERROR "crypto++ library not found")
+    else ()
+        target_link_libraries(${EXECUTABLE_NAME} ${CRYPTOPP_LIB})
     endif ()
 endif ()
 

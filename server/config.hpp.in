@@ -21,3 +21,8 @@ constexpr std::size_t DEFAULT_THREADS = 1;
 
 constexpr char LOGDATE_LOCALE[] = "en_US.UTF8";
 constexpr char LOGDATE_FORMAT[] = "%d/%b/%Y:%H:%M:%S %z";
+
+enum class CryptoLevel {
+    FAST, HIGH, ACADEMIC
+};
+constexpr CryptoLevel CRYPTO_LEVEL = CryptoLevel::FAST;
