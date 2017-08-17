@@ -163,7 +163,9 @@ TEST(EncryptionAndDecryption, matchValuesOfTestVector) {
         filename += prefix;
         filename += suffix;
 
-        auto tv = TestVector::parseRSP(filename);
+        std::vector<TestVector::Test> tv;
+        bool success = TestVector::parseRSP(filename, tv);
+        ASSERT_TRUE(success);
         ASSERT_GE(tv.size(), 1);
 
         for (auto t : tv) {

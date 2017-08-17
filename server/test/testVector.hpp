@@ -1,6 +1,7 @@
 #pragma once
 
 #include <fstream>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -42,13 +43,12 @@ private:
     }
 
 public:
-    static std::vector<Test> parseRSP(const std::string& filename) {
-        std::vector<Test> tv;
-
+    static bool parseRSP(const std::string& filename, std::vector<Test> &tv) {
         std::string line;
         std::ifstream f(filename);
         if (!f.is_open()) {
-            return tv;
+            std::cerr << "Could not open file " << filename << std::endl;
+            return false;
         }
 
         struct Keyword {
@@ -63,6 +63,7 @@ public:
         Keyword kwIV("IV");
         Keyword kwPlain("PLAINTEXT");
         Keyword kwCipher("CIPHERTEXT");
+        Keyword kwCounter("COUNT");
 
         auto startsWith = [](const std::string& line, Keyword kw) {
             if (line.length() < kw.length) return false;
@@ -75,23 +76,52 @@ public:
         };
 
         Test t;
+        int counter = -1;
+        int offset = 0;
         while (getline(f, line)) {
-            if (startsWith(line, kwKey)) {
-                t.key = getFromString(line, kwKey.length);
-            } else if (startsWith(line, kwIV)) {
-                t.iv = getFromString(line, kwIV.length);
-            } else if (startsWith(line, kwPlain)) {
-                t.plain = getFromString(line, kwPlain.length);
-            } else if (startsWith(line, kwCipher)) {
-                t.cipher = getFromString(line, kwCipher.length);
-                
-                tv.push_back(t);
+            try {
+                if (startsWith(line, kwKey)) {
+                    t.key = getFromString(line, kwKey.length);
+                } else if (startsWith(line, kwIV)) {
+                    t.iv = getFromString(line, kwIV.length);
+                } else if (startsWith(line, kwPlain)) {
+                    t.plain = getFromString(line, kwPlain.length);
+                } else if (startsWith(line, kwCipher)) {
+                    t.cipher = getFromString(line, kwCipher.length);
+
+                    /*
+                     * New Test is not yet pushed, but COUNT starts with 0,
+                     * hence counter == tv.size() is expected.
+                     */
+                    if (counter < 0 ||
+                        static_cast<std::size_t>(counter) != tv.size()) {
+                        std::cerr << "Invalid counter" << std::endl;
+                        return false;
+                    }
+                    
+                    tv.push_back(t);
+                } else if (startsWith(line, kwCounter)) {
+                    auto newCounter = std::stoi(line.substr(kwCounter.length + 3));
+
+                    // COUNT is reset to zero after transition [ENCRYPT] -> [DECRYPT]
+                    if (newCounter == 0 && counter >= 0) {
+                        offset = counter + 1;
+                    }
+
+                    counter = newCounter;
+                    counter += offset;
+                }
+            } catch (...) {
+                f.close();
+
+                std::cerr << "Error during line parsing." << std::endl;
+                return false;
             }
         }
 
         f.close();
 
-        return tv;
+        return true;
     }
 };
 
