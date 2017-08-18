@@ -3,11 +3,11 @@
 #include "../src/userInputParser.hpp"
 
 
-class UserInputParserFixture : public ::testing::Test {
+class UserInputParser : public ::testing::Test {
 public:
     std::vector<const char*> argv;
     
-    UserInputParserFixture() {
+    UserInputParser() {
     }
 
     void SetUp() override {
@@ -20,7 +20,7 @@ public:
         argv.clear();
     }
 
-    virtual ~UserInputParserFixture() = default;
+    virtual ~UserInputParser() = default;
 };
 
 
@@ -46,7 +46,7 @@ TEST(DefaultValues, setsThreadsToOne) {
     ASSERT_LE(DEFAULT_THREADS, 1);
 }
 
-TEST_F(UserInputParserFixture, setsDefaultValuesOnEmpty) { 
+TEST_F(UserInputParser, setsDefaultValuesOnEmpty) { 
     Config config;
     auto returnValue = parseUserInput(argv, config);
 
@@ -55,7 +55,7 @@ TEST_F(UserInputParserFixture, setsDefaultValuesOnEmpty) {
     ASSERT_EQ(DEFAULT_THREADS, config.threads);
 }
 
-TEST_F(UserInputParserFixture, setsPortFromUserInput) { 
+TEST_F(UserInputParser, setsPortFromUserInput) { 
     Config config;
 
     argv.push_back("--port");
@@ -71,7 +71,7 @@ TEST_F(UserInputParserFixture, setsPortFromUserInput) {
     ASSERT_EQ(DEFAULT_THREADS, config.threads);
 }
 
-TEST_F(UserInputParserFixture, setsThreadFromUserInput) { 
+TEST_F(UserInputParser, setsThreadFromUserInput) { 
     Config config;
 
     argv.push_back("--threads");
@@ -87,7 +87,7 @@ TEST_F(UserInputParserFixture, setsThreadFromUserInput) {
     ASSERT_EQ(nonDefaultThreads, config.threads);
 }
 
-TEST_F(UserInputParserFixture, setsPortAndThreadsFromUserInput) { 
+TEST_F(UserInputParser, setsPortAndThreadsFromUserInput) { 
     Config config;
 
     argv.push_back("--port");
@@ -109,7 +109,7 @@ TEST_F(UserInputParserFixture, setsPortAndThreadsFromUserInput) {
     ASSERT_EQ(nonDefaultThreads, config.threads);
 }
 
-TEST_F(UserInputParserFixture, setsPortAndThreadsFromUserInputInReversedOrder) { 
+TEST_F(UserInputParser, setsPortAndThreadsFromUserInputInReversedOrder) { 
     Config config;
 
     argv.push_back("--threads");
