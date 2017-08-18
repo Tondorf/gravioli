@@ -51,17 +51,19 @@ byte *allocateWithoutTrailingZero(const std::string msg, std::size_t& nChars) {
 }
 
 
-bool equal(byte *a, char *b, const std::size_t size) {
+::testing::AssertionResult equal(byte *a, char *b, const std::size_t size) {
     for (std::size_t i = 0; i < size; ++i) {
         if (a[i] != static_cast<byte>(b[i])) {
-            return false;
+            return ::testing::AssertionFailure()
+                << "mismatch at postion " << i
+                << "; " << (int) a[i] << " != " << (int) b[i];
         }
     }
 
-    return true;
+    return ::testing::AssertionSuccess();
 }
 
-bool equal(byte *a, std::string b) {
+::testing::AssertionResult equal(byte *a, std::string b) {
     return equal(a, &b[0], b.length());
 }
 
