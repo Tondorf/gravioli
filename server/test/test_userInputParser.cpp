@@ -20,7 +20,7 @@ public:
         argv.clear();
     }
 
-    ~UserInputParserFixture() = default;
+    virtual ~UserInputParserFixture() = default;
 };
 
 
