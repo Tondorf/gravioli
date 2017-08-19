@@ -12,19 +12,19 @@ struct Planet;
 
 struct Planet FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_RADIUS = 4,
-    VT_MASS = 6
+    VT_MASS = 4,
+    VT_RADIUS = 6
   };
-  float radius() const {
-    return GetField<float>(VT_RADIUS, 0.0f);
-  }
   float mass() const {
     return GetField<float>(VT_MASS, 0.0f);
   }
+  float radius() const {
+    return GetField<float>(VT_RADIUS, 0.0f);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<float>(verifier, VT_RADIUS) &&
            VerifyField<float>(verifier, VT_MASS) &&
+           VerifyField<float>(verifier, VT_RADIUS) &&
            verifier.EndTable();
   }
 };
@@ -32,11 +32,11 @@ struct Planet FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct PlanetBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_radius(float radius) {
-    fbb_.AddElement<float>(Planet::VT_RADIUS, radius, 0.0f);
-  }
   void add_mass(float mass) {
     fbb_.AddElement<float>(Planet::VT_MASS, mass, 0.0f);
+  }
+  void add_radius(float radius) {
+    fbb_.AddElement<float>(Planet::VT_RADIUS, radius, 0.0f);
   }
   PlanetBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -52,11 +52,11 @@ struct PlanetBuilder {
 
 inline flatbuffers::Offset<Planet> CreatePlanet(
     flatbuffers::FlatBufferBuilder &_fbb,
-    float radius = 0.0f,
-    float mass = 0.0f) {
+    float mass = 0.0f,
+    float radius = 0.0f) {
   PlanetBuilder builder_(_fbb);
-  builder_.add_mass(mass);
   builder_.add_radius(radius);
+  builder_.add_mass(mass);
   return builder_.Finish();
 }
 
