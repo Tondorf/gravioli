@@ -10,6 +10,7 @@
 
 #include "server/greenwich.hpp"
 #include "server/server.hpp"
+#include "server/publisher.hpp"
 
 
 void awaitShutdown(boost::asio::signal_set &signal,
@@ -55,7 +56,7 @@ int main(int argc, char const* argv[]) {
     Log::info("Version: %d.%d (%s)", VERSION_MAJOR, VERSION_MINOR, BUILD_TYPE_AS_STRING.c_str());
     Log::info("Starting %d thread(s), bound to port %d.", config.threads, config.port);
 
-    server::Server server(config.port, config.threads);
+    server::Server<server::Publisher> server(config.port, config.threads);
 
     boost::asio::io_service ios;
     boost::asio::signal_set shutdownSignal(ios);

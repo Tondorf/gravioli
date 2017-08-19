@@ -11,10 +11,9 @@
 
 #include "SimpleLogger/logger.hpp"
 
-#include "planet_generated.h"
-
 
 namespace server {
+    template<class T>
     class Server {
     private:
         bool _connected;
@@ -24,6 +23,8 @@ namespace server {
 
         void *_context;
         void *_publisher;
+
+        T _dataQueue;
 
 
         bool sendBytes(byte *bytes, const std::size_t size, bool more = false) {
@@ -101,20 +102,13 @@ namespace server {
             };
 
             while (!_stopped) {
+                for (auto&& data : _dataQueue.pop()) {
+                    auto bytes = static_cast<byte *>(data.data());
+                    auto size = static_cast<std::size_t>(data.size());
 
-                /*
-                 * TESTING AREA
-                 *
-                 * remember to delete respective #include directives, too
-                 */
-                flatbuffers::FlatBufferBuilder builder;
-                auto game = game::CreatePlanet(builder, 1.f, 2.f, 3.f);
-                builder.Finish(game);
-                byte *data = static_cast<byte *>(builder.GetBufferPointer());
-                auto size = static_cast<std::size_t>(builder.GetSize());
-
-                if (!cryptAndSendBytes(data, size, KEY)) {
-                    Log::error("Error during message transmission");
+                    if (!cryptAndSendBytes(bytes, size, KEY)) {
+                        Log::error("Error during message transmission");
+                    }
                 }
 
                 sleep();

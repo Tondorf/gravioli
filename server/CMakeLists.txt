@@ -45,7 +45,8 @@ include_directories(fbs)
 set(EXECUTABLE_NAME "server")
 set(SOURCE_FILES src/main.cxx
                  src/server/server.hpp
-                 src/server/crypto.hpp)
+                 src/server/crypto.hpp
+                 src/server/publisher.hpp)
 add_executable(${EXECUTABLE_NAME} ${SOURCE_FILES})
 
 # require C++14
