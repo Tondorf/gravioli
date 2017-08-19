@@ -4,6 +4,14 @@ cmake_minimum_required(VERSION 3.5.1)
 set(CMAKE_BUILD_TYPE debug)
 
 project(server)
+set(VERSION_MAJOR 0)
+set(VERSION_MINOR 1)
+
+# set version information in config.h file
+configure_file(
+    "${PROJECT_SOURCE_DIR}/config.hpp.in"
+    "${PROJECT_BINARY_DIR}/config.hpp"
+)
 
 # Copy files from source directory to destination directory and
 # creates destination directory if it does not exist.
@@ -25,18 +33,13 @@ macro(configure_files srcDir destDir)
     endforeach(templateFile)
 endmacro(configure_files)
 
-# set version information in a config.h file
-set(VERSION_MAJOR 0)
-set(VERSION_MINOR 1)
-configure_file(
-    "${PROJECT_SOURCE_DIR}/config.hpp.in"
-    "${PROJECT_BINARY_DIR}/config.hpp"
-)
-
 include_directories("${PROJECT_BINARY_DIR}")
 
-# include SimpleLogger
-include_directories(lib/SimpleLogger)
+# include libraries
+include_directories(lib)
+
+# include generated flatbuffers files
+include_directories(fbs)
 
 # define sources and executable
 set(EXECUTABLE_NAME "server")

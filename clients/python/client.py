@@ -1,9 +1,13 @@
+import flatbuffers
 import signal
 import time
 import zmq
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
+
+from fbs.game.Planet import Planet
+
 
 def client(port):
     context = zmq.Context()
@@ -29,9 +33,10 @@ def client(port):
         else:
             aes = Cipher(algorithms.AES(key), modes.CFB(iv), backend=backend)
             decryptor = aes.decryptor()
-            print(['{:2x}'.format(b) for b in cipher])
             msg = decryptor.update(cipher) + decryptor.finalize()
-            print(['{:2x}'.format(b) for b in msg])
+
+            planet = Planet.GetRootAsPlanet(msg, 0)
+            print('Planet(mass={:f}, radius={:f})'.format(planet.Mass(), planet.Radius()))
 
     socket.close()
 

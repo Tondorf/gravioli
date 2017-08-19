@@ -3,7 +3,7 @@
 
 #include <boost/asio.hpp>
 
-#include "logger.hpp"
+#include "SimpleLogger/logger.hpp"
 
 #include "config.hpp"
 #include "userInputParser.hpp"

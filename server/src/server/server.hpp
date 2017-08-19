@@ -8,7 +8,10 @@
 
 #include "config.hpp"
 #include "crypto.hpp"
-#include "logger.hpp"
+
+#include "SimpleLogger/logger.hpp"
+
+#include "planet_generated.h"
 
 
 namespace server {
@@ -98,8 +101,19 @@ namespace server {
             };
 
             while (!_stopped) {
-                byte msgdata[] = { 0x04, 0x08, 0x0f, 0x10, 0x17, 0x2a };
-                if (!cryptAndSendBytes(msgdata, 6, KEY)) {
+
+                /*
+                 * TESTING AREA
+                 *
+                 * remember to delete respective #include directives, too
+                 */
+                flatbuffers::FlatBufferBuilder builder;
+                auto game = game::CreatePlanet(builder, 1.f, 2.f, 3.f);
+                builder.Finish(game);
+                byte *data = static_cast<byte *>(builder.GetBufferPointer());
+                auto size = static_cast<std::size_t>(builder.GetSize());
+
+                if (!cryptAndSendBytes(data, size, KEY)) {
                     Log::error("Error during message transmission");
                 }
 

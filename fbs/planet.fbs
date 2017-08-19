@@ -1,0 +1,8 @@
+namespace game;
+
+table Planet {
+    radius: float;
+    mass: float;
+}
+
+root_type Planet;
