@@ -5,7 +5,7 @@
 #include <boost/program_options.hpp>
 
 #include "config.hpp"
-#include "logger.hpp"
+#include "SimpleLogger/logger.hpp"
 
 
 struct Config {
