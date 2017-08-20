@@ -24,7 +24,8 @@ namespace server {
 
             while (currentlyAllocatedInstances.load() > 0) {
                 Log::info("Waiting until all allocated instances of Publisher \
-                           are deleted...");
+                           are deleted: %d instances",
+                          currentlyAllocatedInstances.load());
 
                 std::this_thread::sleep_for(1s);
             }
@@ -38,7 +39,7 @@ namespace server {
                 > SIMULTANEOUSLY_ALLOCATED_INSTANCES_THRESHOLD) {
                 Log::error("Number of simultaneously allocated instances\
                             is above threshold: %d instances",
-                            currentlyAllocatedInstances.load());
+                           currentlyAllocatedInstances.load());
             }
 
             using flatbuffers::FlatBufferBuilder;
