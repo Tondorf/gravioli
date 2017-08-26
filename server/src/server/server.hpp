@@ -53,7 +53,9 @@ namespace server {
      *
      * Messages pop()
      *
-     * After poping messages, Server will sent these over the wire.
+     * After poping messages, Server will encrypt and sent these over the wire.
+     * For encryption Server use the provided key and generated a random IV.
+     * The IV is sent firstly, followed by the corresponding encrypted message.
      * If messages are marked by setting the bool flag (see struct Messages),
      * Server will
      *
