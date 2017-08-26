@@ -45,7 +45,7 @@ namespace server {
         std::vector<BinaryData *> pop() {
             if (currentlyAllocatedInstances.load() 
                 > SIMULTANEOUSLY_ALLOCATED_INSTANCES_THRESHOLD) {
-                Log::error("Number of simultaneously allocated instances\
+                Log::error("Number of simultaneously allocated instances \
                             is above threshold: %d instances",
                            currentlyAllocatedInstances.load());
             }
