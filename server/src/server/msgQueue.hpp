@@ -10,7 +10,7 @@
 
 
 namespace server {
-    class Publisher {
+    class MsgQueue {
     private:
         int _lastAllocSize; 
 
@@ -23,22 +23,22 @@ namespace server {
         static std::atomic<std::size_t> currentlyAllocatedInstances;
 
 
-        Publisher() : _lastAllocSize(-1) {
+        MsgQueue() : _lastAllocSize(-1) {
         }
 
 
-        virtual ~Publisher() {
+        virtual ~MsgQueue() {
             using namespace std::chrono_literals;
 
             while (currentlyAllocatedInstances.load() > 0) {
-                Log::info("Waiting until all allocated instances of Publisher \
+                Log::info("Waiting until all allocated instances of MsgQueue \
                            are deleted: %d instances",
                           currentlyAllocatedInstances.load());
 
                 std::this_thread::sleep_for(1s);
             }
 
-            Log::info("All allocated instances of Publisher are deleted.");
+            Log::info("All allocated instances of MsgQueue are deleted.");
         }
 
 
@@ -71,11 +71,11 @@ namespace server {
         }
     };
 
-    std::atomic<std::size_t> Publisher::currentlyAllocatedInstances(0);
+    std::atomic<std::size_t> MsgQueue::currentlyAllocatedInstances(0);
 
 
     void customFree(void * /*data*/, void *hint) {
-        --Publisher::currentlyAllocatedInstances;
+        --MsgQueue::currentlyAllocatedInstances;
 
         delete static_cast<flatbuffers::FlatBufferBuilder *>(hint);
     }
