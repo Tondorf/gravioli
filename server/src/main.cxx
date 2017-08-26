@@ -10,7 +10,7 @@
 
 #include "server/greenwich.hpp"
 #include "server/server.hpp"
-#include "server/publisher.hpp"
+#include "server/msgQueue.hpp"
 
 
 void awaitShutdown(boost::asio::signal_set &signal,
