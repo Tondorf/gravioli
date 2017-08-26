@@ -13,39 +13,63 @@
 
 
 namespace server {
+    class IMessage {
+    public:
+        virtual byte *getBufferPointer() const = 0;
+        virtual std::size_t getSize() const = 0;
+    };
+
+    class IMsgQueue {
+    public:
+        struct Messages {
+            /*
+             * The bool flag mark a message as candidate for deletion after
+             * sending.
+             * For more details, see class Server.
+             */
+            using msg_t = std::pair<IMessage *, bool>;
+
+            std::size_t topicID;
+            std::vector<msg_t> msgs;
+
+            Messages(std::size_t id, std::vector<msg_t>&& m):
+                topicID(id),
+                msgs(std::forward<std::vector<msg_t>>(m)) {
+            }
+        };
+
+        virtual ~IMsgQueue() = default;
+
+        virtual Messages pop() = 0;
+    };
+
     
     extern void customFree(void * /*data*/, void * /*hint*/);
 
     /*
-     * T has to provide the implementations of the member function:
+     * T has to provide an implementations of IMsgQueue.
+     * That includes the implementation of 
      *
-     * std::vector<S> pop()
+     * Messages pop()
      *
-     * whereas S has to provide the implementations of the member functions:
-     *
-     * S'  GetBufferPointer()
-     * S'' GetSize()
-     *
-     * where the return values S' and S'' are convertible to byte * and
-     * std::size_t, respectively.
-     *
-     * After poping instances of S, Server will sent these encrypted over the
-     * wire and 
+     * After poping messages, Server will sent these over the wire.
+     * If messages are marked by setting the bool flag (see struct Messages),
+     * Server will
      *
      * (!) DELETE THEM AFTERWARDS (!)
      *
      * by calling 
      *
-     * void customFree(void *s', void *t)
+     * void customFree(void *s, void *t)
      *
-     * s' and t are void pointers to respective S' and T instance, that was
-     * poped before.
+     * s and t are void pointers to byte and T instance.
      * Not implementing this deallocation will lead dangling pointers!
-     * It is reasonable to implement this custom deallocation near by the
-     * implementation of T.
      */
     template<class T>
     class Server {
+        static_assert(std::is_base_of<IMsgQueue, T>::value,
+                      "not base of IMsgQueue");
+
     private:
         bool _connected;
         bool _stopped;
@@ -159,14 +183,13 @@ namespace server {
             };
 
             while (!_stopped) {
-                for (auto container : _dataQueue.pop()) {
+                auto container = _dataQueue.pop();
+                for (auto&& msg : container.msgs) {
+                    auto&& container = std::get<0>(msg);
+//                    bool deleteAfterSending = std::get<1>(msg);
 
-                    auto bytes = static_cast<byte *>(
-                        container->GetBufferPointer()
-                    );
-                    auto size = static_cast<std::size_t>(
-                        container->GetSize()
-                    );
+                    auto bytes = container->getBufferPointer();
+                    auto size = container->getSize();
 
                     if (!cryptAndSendBytes(bytes, container, size, KEY)) {
                         Log::error("Error during message transmission");
