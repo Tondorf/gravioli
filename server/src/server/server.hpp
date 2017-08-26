@@ -17,6 +17,7 @@ namespace server {
     public:
         virtual byte *getBufferPointer() const = 0;
         virtual std::size_t getSize() const = 0;
+        virtual const crypto::Key& key() const = 0;
     };
 
     class IMsgQueue {
@@ -178,28 +179,21 @@ namespace server {
                 std::this_thread::sleep_for(1s);
             };
 
-            constexpr crypto::Key KEY {
-                0x00, 0x01, 0x02, 0x03,
-                0x04, 0x05, 0x06, 0x07,
-                0x08, 0x09, 0x0a, 0x0b,
-                0x0c, 0x0d, 0x0e, 0x0f
-            };
-
             while (!_stopped) {
                 auto popped = _msgQueue.pop();
                 for (auto&& msg : popped.msgs) {
                     auto&& container = std::get<0>(msg);
-                    bool deleteAfterSending = std::get<1>(msg);
-
-                    auto bytes = container->getBufferPointer();
-                    auto size = container->getSize();
 
                     void *memOwner = nullptr;
+                    bool deleteAfterSending = std::get<1>(msg);
                     if (deleteAfterSending) {
                         memOwner = container;
                     }
 
-                    if (!cryptAndSendBytes(bytes, memOwner, size, KEY)) {
+                    if (!cryptAndSendBytes(container->getBufferPointer(),
+                                           memOwner,
+                                           container->getSize(),
+                                           container->key())) {
                         Log::error("Error during message transmission");
                     }
                 }

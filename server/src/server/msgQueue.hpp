@@ -15,13 +15,18 @@
 namespace server {
     class Message: public IMessage, 
                    public flatbuffers::FlatBufferBuilder {
+    private:
+        const crypto::Key _key;
+
     public:
-        Message():
-            flatbuffers::FlatBufferBuilder() {
+        Message(const crypto::Key& key):
+            flatbuffers::FlatBufferBuilder(),
+            _key(key) {
         }
 
-        Message(std::size_t allocSize):
-            flatbuffers::FlatBufferBuilder(allocSize) {
+        Message(const crypto::Key& key, std::size_t allocSize):
+            flatbuffers::FlatBufferBuilder(allocSize),
+            _key(key) {
         }
 
 
@@ -35,6 +40,11 @@ namespace server {
 
         virtual std::size_t getSize() const {
             return static_cast<std::size_t>(GetSize());
+        }
+
+
+        virtual const crypto::Key& key() const {
+            return _key;
         }
 
 
@@ -82,11 +92,18 @@ namespace server {
                            currentlyAllocatedInstances.load());
             }
 
+            constexpr crypto::Key KEY {
+                0x00, 0x01, 0x02, 0x03,
+                0x04, 0x05, 0x06, 0x07,
+                0x08, 0x09, 0x0a, 0x0b,
+                0x0c, 0x0d, 0x0e, 0x0f
+            };
+
             Message *builder = nullptr;
             if (_lastAllocSize > 0) {
-                builder = new Message(_lastAllocSize);
+                builder = new Message(KEY, _lastAllocSize);
             } else {
-                builder = new Message();
+                builder = new Message(KEY);
             }
 
             ++currentlyAllocatedInstances;
