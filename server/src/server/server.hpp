@@ -79,7 +79,7 @@ namespace server {
         void *_context;
         void *_publisher;
 
-        T _dataQueue;
+        T _msgQueue;
 
 
         bool sendMessage(zmq_msg_t *msg, const std::size_t size, bool more) {
@@ -183,8 +183,8 @@ namespace server {
             };
 
             while (!_stopped) {
-                auto container = _dataQueue.pop();
-                for (auto&& msg : container.msgs) {
+                auto popped = _msgQueue.pop();
+                for (auto&& msg : popped.msgs) {
                     auto&& container = std::get<0>(msg);
 //                    bool deleteAfterSending = std::get<1>(msg);
 
