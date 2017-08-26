@@ -184,6 +184,18 @@ namespace server {
             while (!_stopped) {
                 auto popped = _msgQueue.pop();
                 for (auto&& msg : popped.msgs) {
+                    { // send topicID as byte array (little-endian)
+                        std::size_t topicID = popped.topicID;
+                        constexpr std::size_t nbytes = sizeof(topicID);
+                        byte topicIDAsByteArray[nbytes];
+                        for (std::size_t i = 0; i < nbytes; ++i) {
+                            auto index = nbytes - 1 - i;
+                            topicIDAsByteArray[index] = (topicID >> (i * 8));
+                        }
+
+                        sendBytes(topicIDAsByteArray, nbytes, true);
+                    }
+
                     auto&& container = std::get<0>(msg);
 
                     void *memOwner = nullptr;

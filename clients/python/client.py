@@ -27,7 +27,7 @@ def client(port):
 
     while running:
         try:
-            iv, cipher = socket.recv_multipart(zmq.NOBLOCK)
+            topicID, iv, cipher = socket.recv_multipart(zmq.NOBLOCK)
         except zmq.ZMQError:
             time.sleep(0.1)
         else:
