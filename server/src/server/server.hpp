@@ -108,6 +108,10 @@ namespace server {
                        void *memOwner,
                        const std::size_t size,
                        bool more) {
+            if (memOwner == nullptr) {
+                return sendBytes(bytes, size, more);
+            }
+
             zmq_msg_t msg;
             
             int rc = zmq_msg_init_data(&msg, bytes, size, customFree, memOwner);
@@ -136,7 +140,6 @@ namespace server {
             return sendBytes(&iv[0], crypto::IV_BLOCKSIZE, true) &&
                    sendBytes(bytes, memOwner, size, more);
         }
-
 
     public:
         Server(const Server&) = delete;
@@ -186,12 +189,17 @@ namespace server {
                 auto popped = _msgQueue.pop();
                 for (auto&& msg : popped.msgs) {
                     auto&& container = std::get<0>(msg);
-//                    bool deleteAfterSending = std::get<1>(msg);
+                    bool deleteAfterSending = std::get<1>(msg);
 
                     auto bytes = container->getBufferPointer();
                     auto size = container->getSize();
 
-                    if (!cryptAndSendBytes(bytes, container, size, KEY)) {
+                    void *memOwner = nullptr;
+                    if (deleteAfterSending) {
+                        memOwner = container;
+                    }
+
+                    if (!cryptAndSendBytes(bytes, memOwner, size, KEY)) {
                         Log::error("Error during message transmission");
                     }
                 }
