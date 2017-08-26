@@ -22,8 +22,15 @@ namespace crypto {
     using IV = std::array<byte, IV_BLOCKSIZE>;
 
 
-    void encrypt(byte *msg, const std::size_t msgLength, const Key& key, const IV& iv) {
-        CryptoPP::CFB_Mode<CryptoPP::AES>::Encryption cfbEncryption(key.data(), key.size(), iv.data());
+    void encrypt(byte *msg,
+                 const std::size_t msgLength,
+                 const Key& key,
+                 const IV& iv) {
+        CryptoPP::CFB_Mode<CryptoPP::AES>::Encryption cfbEncryption(
+            key.data(),
+            key.size(),
+            iv.data()
+        );
         cfbEncryption.ProcessData(msg, msg, msgLength);
     }
 
@@ -39,8 +46,15 @@ namespace crypto {
     }
 
 
-    void decrypt(byte *msg, const std::size_t msgLength, const Key& key, const IV& iv) {
-        CryptoPP::CFB_Mode<CryptoPP::AES>::Decryption cfbDecryption(key.data(), key.size(), iv.data());
+    void decrypt(byte *msg,
+                 const std::size_t msgLength,
+                 const Key& key,
+                 const IV& iv) {
+        CryptoPP::CFB_Mode<CryptoPP::AES>::Decryption cfbDecryption(
+            key.data(),
+            key.size(),
+            iv.data()
+        );
         cfbDecryption.ProcessData(msg, msg, msgLength);
     }
 }
