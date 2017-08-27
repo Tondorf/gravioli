@@ -10,7 +10,6 @@
 
 struct Config {
     port_t port;
-    std::size_t threads;
 };
 
 
@@ -22,9 +21,7 @@ bool parseUserInput(int argc, char const* argv[], Config& config) {
         ("help",    "Print help message")
         ("version", "Print version")
         ("port",    po::value<port_t>()->default_value(DEFAULT_PORT),
-                    "Set the port number for the server")
-        ("threads", po::value<std::size_t>()->default_value(DEFAULT_THREADS),
-                    "Set the number of threads to use");
+                    "Set the port number for the server");
 
     bool parsingSuccessfully = true;
     po::variables_map vm;
@@ -48,10 +45,8 @@ bool parseUserInput(int argc, char const* argv[], Config& config) {
     }
 
     assert(vm.count("port"));
-    assert(vm.count("threads"));
 
     config.port = vm["port"].as<port_t>();
-    config.threads = vm["threads"].as<std::size_t>();
 
     return true;
 }

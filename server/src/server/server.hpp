@@ -77,7 +77,6 @@ namespace server {
         bool _connected;
         bool _stopped;
         const port_t _port;
-        const std::size_t _threads;
 
         void *_context;
         void *_publisher;
@@ -149,11 +148,10 @@ namespace server {
 
         Server& operator=(const Server&) = delete;
 
-        Server(port_t port, std::size_t threads):
+        Server(port_t port):
             _connected(false),
             _stopped(false),
-            _port(port),
-            _threads(threads) {
+            _port(port) {
             _context = zmq_ctx_new();
             _publisher = zmq_socket(_context, ZMQ_PUB);
 

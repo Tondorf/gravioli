@@ -55,10 +55,8 @@ int main(int argc, char const* argv[]) {
 
     Log::info("Version: %d.%d (%s)",
               VERSION_MAJOR, VERSION_MINOR, BUILD_TYPE_AS_STRING.c_str());
-    Log::info("Starting %d thread(s), bound to port %d.",
-              config.threads, config.port);
 
-    server::Server<server::MsgQueue> server(config.port, config.threads);
+    server::Server<server::MsgQueue> server(config.port);
 
     boost::asio::io_service ios;
     boost::asio::signal_set shutdownSignal(ios);
