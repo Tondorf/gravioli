@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "../src/userInputParser.hpp"
+#include "userInputParser.hpp"
 
 
 class UserInputParser : public ::testing::Test {

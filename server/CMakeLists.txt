@@ -33,21 +33,26 @@ macro(configure_files srcDir destDir)
     endforeach(templateFile)
 endmacro(configure_files)
 
+# main include directory
+include_directories("include")
+
+# include *.hpp.in
 include_directories("${PROJECT_BINARY_DIR}")
 
 # include libraries
-include_directories(lib)
+include_directories("lib")
 
 # include generated flatbuffers files
-include_directories(fbs)
+include_directories("fbs")
 
 # define sources and executable
 set(EXECUTABLE_NAME "server")
-set(SOURCE_FILES src/main.cxx
-                 src/server/server.hpp
-                 src/server/crypto.hpp
-                 src/server/msgQueue.hpp)
-add_executable(${EXECUTABLE_NAME} ${SOURCE_FILES})
+set(SOURCE_FILES src/userInputParser.cpp
+                 src/server.cpp
+                 src/greenwich.cpp
+                 src/crypto.cpp
+                 src/msgQueue.cpp)
+add_executable(${EXECUTABLE_NAME} src/main.cxx ${SOURCE_FILES})
 
 # require C++14
 set_target_properties(
@@ -102,7 +107,7 @@ if (GTEST_FOUND)
     set(EXECUTABLE_NAME "runAllUnitTests")
 
     enable_testing()
-    add_executable(${EXECUTABLE_NAME} ${UNITTEST_FILES})
+    add_executable(${EXECUTABLE_NAME} ${UNITTEST_FILES} ${SOURCE_FILES})
     target_link_libraries(${EXECUTABLE_NAME} gtest gtest_main)
     add_test(NAME ${EXECUTABLE_NAME} COMMAND runUnitTests)
 
@@ -113,19 +118,9 @@ if (GTEST_FOUND)
         CXX_STANDARD_REQUIRED ON
     )
 
-    # add Boost library
-    find_package(Boost COMPONENTS program_options REQUIRED)
-    if (Boost_FOUND)
-        include_directories(${Boost_INCLUDE_DIR})
-        target_link_libraries(${EXECUTABLE_NAME} ${Boost_LIBRARIES})
-    endif ()
-
-    # add crypto++ library
-    find_library(CRYPTOPP_LIB crypto++)
-    if (NOT CRYPTOPP_LIB)
-        message(FATAL_ERROR "crypto++ library not found")
-    else ()
-        target_link_libraries(${EXECUTABLE_NAME} ${CRYPTOPP_LIB})
-    endif ()
+    target_link_libraries(${EXECUTABLE_NAME} ${Boost_LIBRARIES})
+    target_link_libraries(${EXECUTABLE_NAME} ${CMAKE_THREAD_LIBS_INIT})
+    target_link_libraries(${EXECUTABLE_NAME} ${ZMQ_LIB})
+    target_link_libraries(${EXECUTABLE_NAME} ${CRYPTOPP_LIB})
 endif ()
 

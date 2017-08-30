@@ -4,7 +4,7 @@
 
 #include "testVector.hpp"
 
-#include "../src/server/crypto.hpp"
+#include "crypto.hpp"
 
 
 constexpr std::size_t KEY_LENGTH = crypto::KEY_BLOCKSIZE;

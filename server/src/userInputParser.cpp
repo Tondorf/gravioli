@@ -1,16 +1,10 @@
-#pragma once
-
 #include <iostream>
 
 #include <boost/program_options.hpp>
 
-#include "config.hpp"
+#include "userInputParser.hpp"
+
 #include "SimpleLogger/logger.hpp"
-
-
-struct Config {
-    port_t port;
-};
 
 
 bool parseUserInput(int argc, char const* argv[], Config& config) {

@@ -26,3 +26,5 @@ enum class CryptoLevel {
     FAST, HIGH, ACADEMIC
 };
 constexpr CryptoLevel CRYPTO_LEVEL = CryptoLevel::FAST;
+
+using byte = std::uint8_t;
