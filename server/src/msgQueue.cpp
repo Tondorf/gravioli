@@ -93,7 +93,7 @@ namespace server {
 
         const std::size_t ID = 0;
         std::vector<Messages::msg_t> msgs;
-        msgs.push_back(std::make_pair(builder, true));
+        msgs.push_back(std::make_pair(builder, &customFree));
 
         return Messages(ID, std::move(msgs));
     }

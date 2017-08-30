@@ -39,10 +39,11 @@ namespace server {
 
 
     bool Server::sendBytes(byte *bytes,
+                           CustomFreePtr_t customFree,
                            void *memOwner,
                            const std::size_t size,
                            bool more) {
-        if (memOwner == nullptr) {
+        if (customFree == nullptr) {
             return sendBytes(bytes, size, more);
         }
 
@@ -58,6 +59,7 @@ namespace server {
 
 
     bool Server::cryptAndSendBytes(byte *bytes, 
+                                   CustomFreePtr_t customFree,
                                    void *memOwner,
                                    const std::size_t size,
                                    const crypto::Key& key,
@@ -72,7 +74,7 @@ namespace server {
          * memcpy is faster / non-critically.
          */
         return sendBytes(&iv[0], crypto::IV_BLOCKSIZE, true) &&
-               sendBytes(bytes, memOwner, size, more);
+               sendBytes(bytes, customFree, memOwner, size, more);
     }
 
 
@@ -128,12 +130,13 @@ namespace server {
                 auto&& container = std::get<0>(msg);
 
                 void *memOwner = nullptr;
-                bool deleteAfterSending = std::get<1>(msg);
-                if (deleteAfterSending) {
+                auto customFree = std::get<1>(msg);
+                if (customFree != nullptr) {
                     memOwner = container;
                 }
 
                 if (!cryptAndSendBytes(container->getBufferPointer(),
+                                       customFree,
                                        memOwner,
                                        container->getSize(),
                                        container->key())) {
