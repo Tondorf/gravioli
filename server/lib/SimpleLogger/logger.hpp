@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cassert>
 #include <cstdarg>
 #include <iostream>
 #include <functional>
