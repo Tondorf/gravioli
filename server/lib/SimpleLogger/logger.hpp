@@ -11,6 +11,7 @@ namespace Log {
         DEBUG = 0, INFO = 1, WARNING = 2, ERROR = 3
     };
 
+
     class SimpleLogger {
     private:
         FILE *_out;
@@ -29,22 +30,28 @@ namespace Log {
             fclose(_out);
         }
 
+
         static SimpleLogger& getInstance() {
             static SimpleLogger instance;
             return instance;
         }
 
+
         SimpleLogger(const SimpleLogger&) = delete;
 
+
         void operator=(const SimpleLogger&) = delete;
+
 
         void setLogLevel(const LogLevel level) {
             _logLevel = level;
         }
 
+
         LogLevel getLogLevel() const {
             return _logLevel;
         }
+
 
         static std::string logLevelAsString(const LogLevel level) {
             switch (level) {
@@ -60,21 +67,25 @@ namespace Log {
             return "UNKNOWN";
         }
 
+
         void addTimestamp(const std::function<std::string(void)>& f) {
             _printTimestamp = true;
             _time = f;
         }
 
+
         void hideTimestamp() {
             _printTimestamp = false;
         }
+
 
         void log(const LogLevel logLevel, const char *msg, va_list args) {
             if (logLevel >= _logLevel) {
                 auto logLevel_str = logLevelAsString(logLevel);
                 if (_printTimestamp) {
                     auto formatedTime = _time();
-                    fprintf(_out, "[%s] %s", logLevel_str.c_str(), formatedTime.c_str());
+                    fprintf(_out, "[%s] %s", logLevel_str.c_str(),
+                                             formatedTime.c_str());
                 } else {
                     fprintf(_out, "[%s]", logLevel_str.c_str());
                 }
@@ -85,6 +96,7 @@ namespace Log {
         }
     };
 
+
     void debug(const char *msg, ...) {
         va_list args;
         va_start(args, msg);
@@ -92,12 +104,14 @@ namespace Log {
         va_end(args);
     }
 
+
     void info(const char *msg, ...) {
         va_list args;
         va_start(args, msg);
         SimpleLogger::getInstance().log(LogLevel::INFO, msg, args);
         va_end(args);
     }
+
 
     void warning(const char *msg, ...) {
         va_list args;
