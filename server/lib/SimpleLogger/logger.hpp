@@ -97,7 +97,7 @@ namespace Log {
     };
 
 
-    void debug(const char *msg, ...) {
+    inline void debug(const char *msg, ...) {
         va_list args;
         va_start(args, msg);
         SimpleLogger::getInstance().log(LogLevel::DEBUG, msg, args);
@@ -105,7 +105,7 @@ namespace Log {
     }
 
 
-    void info(const char *msg, ...) {
+    inline void info(const char *msg, ...) {
         va_list args;
         va_start(args, msg);
         SimpleLogger::getInstance().log(LogLevel::INFO, msg, args);
@@ -113,14 +113,14 @@ namespace Log {
     }
 
 
-    void warning(const char *msg, ...) {
+    inline void warning(const char *msg, ...) {
         va_list args;
         va_start(args, msg);
         SimpleLogger::getInstance().log(LogLevel::WARNING, msg, args);
         va_end(args);
     }
 
-    void error(const char *msg, ...) {
+    inline void error(const char *msg, ...) {
         va_list args;
         va_start(args, msg);
         SimpleLogger::getInstance().log(LogLevel::ERROR, msg, args);
