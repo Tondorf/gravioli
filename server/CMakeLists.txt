@@ -51,7 +51,7 @@ set(SOURCE_FILES src/userInputParser.cpp
                  src/server.cpp
                  src/greenwich.cpp
                  src/crypto.cpp
-                 src/msgQueue.cpp)
+                 src/simpleMsgQueue.cpp)
 add_executable(${EXECUTABLE_NAME} src/main.cxx ${SOURCE_FILES})
 
 # require C++14
@@ -97,7 +97,8 @@ endif ()
 find_package(GTest)
 if (GTEST_FOUND)
     set(UNITTEST_FILES test/test_userInputParser.cpp
-                       test/test_crypto.cpp)
+                       test/test_crypto.cpp
+                       test/test_simpleMsgQueue.cpp)
 
     configure_files(
         "${PROJECT_SOURCE_DIR}/test/KAT_AES"
@@ -107,8 +108,10 @@ if (GTEST_FOUND)
     set(EXECUTABLE_NAME "runAllUnitTests")
 
     enable_testing()
-    add_executable(${EXECUTABLE_NAME} ${UNITTEST_FILES} ${SOURCE_FILES})
-    target_link_libraries(${EXECUTABLE_NAME} gtest gtest_main)
+    add_executable(${EXECUTABLE_NAME} test/main.cxx
+                                      ${UNITTEST_FILES}
+                                      ${SOURCE_FILES})
+    target_link_libraries(${EXECUTABLE_NAME} gtest)
     add_test(NAME ${EXECUTABLE_NAME} COMMAND runUnitTests)
 
     # require C++14

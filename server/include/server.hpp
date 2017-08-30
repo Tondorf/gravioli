@@ -14,7 +14,9 @@ namespace server {
     class IMessage {
     public:
         virtual byte *getBufferPointer() const = 0;
+
         virtual std::size_t getSize() const = 0;
+
         virtual const crypto::Key& key() const = 0;
     };
 
@@ -26,6 +28,20 @@ namespace server {
             std::size_t topicID;
             std::vector<msg_t> msgs;
 
+            Messages(): topicID(0) {
+            }
+
+            Messages(Messages&& other):
+                topicID(std::move(other.topicID)), 
+                msgs(std::move(other.msgs)) {
+            }
+
+            Messages& operator=(Messages&& other) {
+                topicID = std::move(other.topicID);
+                msgs = std::move(other.msgs);
+                return *this;
+            }
+
             Messages(std::size_t id, std::vector<msg_t>&& m):
                 topicID(id),
                 msgs(std::forward<std::vector<msg_t>>(m)) {
@@ -34,7 +50,7 @@ namespace server {
 
         virtual ~IMsgQueue() = default;
 
-        virtual Messages pop() = 0;
+        virtual bool pop(Messages&) = 0;
     };
 
     

@@ -10,7 +10,7 @@
 
 #include "greenwich.hpp"
 #include "server.hpp"
-#include "msgQueue.hpp"
+#include "simpleMsgQueue.hpp"
 
 
 void awaitShutdown(boost::asio::signal_set &signal,
@@ -56,7 +56,8 @@ int main(int argc, char const* argv[]) {
     Log::info("Version: %d.%d (%s)",
               VERSION_MAJOR, VERSION_MINOR, BUILD_TYPE_AS_STRING.c_str());
 
-    server::Server server(config.port, std::make_shared<server::MsgQueue>());
+    using MsgQueue = server::SimpleMsgQueue;
+    server::Server server(config.port, std::make_shared<MsgQueue>());
 
     boost::asio::io_service ios;
     boost::asio::signal_set shutdownSignal(ios);

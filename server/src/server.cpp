@@ -86,6 +86,8 @@ namespace server {
         _publisher(zmq_socket(_context, ZMQ_PUB)),
         _msgQueue(msgQueue) {
 
+        Log::info("Server listens on port %d", port);
+
         std::string endpoint = std::string("tcp://*:")
                              + std::to_string(_port);
         if (zmq_bind(_publisher, endpoint.c_str()) != 0) {
@@ -113,34 +115,35 @@ namespace server {
         };
 
         while (!_stopped) {
-            auto popped = _msgQueue->pop();
-            for (auto&& msg : popped.msgs) {
-                { // send topicID as byte array (little-endian)
-                    std::size_t topicID = popped.topicID;
-                    constexpr std::size_t nbytes = sizeof(topicID);
-                    byte topicIDAsByteArray[nbytes];
-                    for (std::size_t i = 0; i < nbytes; ++i) {
-                        auto index = nbytes - 1 - i;
-                        topicIDAsByteArray[index] = (topicID >> (i * 8));
+            IMsgQueue::Messages popped;
+            while (_msgQueue->pop(popped)) {
+                for (auto&& msg : popped.msgs) {
+                    { // sends topicID as byte array (little-endian)
+                        auto& topicID = popped.topicID;
+                        constexpr std::size_t nbytes = sizeof(topicID);
+                        byte topicIDAsByteArray[nbytes];
+                        for (std::size_t i = 0; i < nbytes; ++i) {
+                            auto index = nbytes - 1 - i;
+                            topicIDAsByteArray[index] = (topicID >> (i * 8));
+                        }
+                        sendBytes(topicIDAsByteArray, nbytes, true);
                     }
 
-                    sendBytes(topicIDAsByteArray, nbytes, true);
-                }
+                    auto&& container = std::get<0>(msg);
 
-                auto&& container = std::get<0>(msg);
+                    void *memOwner = nullptr;
+                    auto customFree = std::get<1>(msg);
+                    if (customFree != nullptr) {
+                        memOwner = container;
+                    }
 
-                void *memOwner = nullptr;
-                auto customFree = std::get<1>(msg);
-                if (customFree != nullptr) {
-                    memOwner = container;
-                }
-
-                if (!cryptAndSendBytes(container->getBufferPointer(),
-                                       customFree,
-                                       memOwner,
-                                       container->getSize(),
-                                       container->key())) {
-                    Log::error("Error during message transmission");
+                    if (!cryptAndSendBytes(container->getBufferPointer(),
+                                           customFree,
+                                           memOwner,
+                                           container->getSize(),
+                                           container->key())) {
+                        Log::error("Error during message transmission");
+                    }
                 }
             }
 
@@ -152,7 +155,7 @@ namespace server {
 
 
     void Server::stop() {
-        Log::info("Stopping server...");
+        Log::info("Stopping server ...");
         _stopped = true;
     }
 }
