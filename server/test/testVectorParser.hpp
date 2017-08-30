@@ -18,7 +18,8 @@ public:
     };
 
 private:
-    static std::vector<byte> getFromString(const std::string& line, const int pos) {
+    static std::vector<byte> getFromString(const std::string& line,
+                                           const int pos) {
         auto value = line.substr(pos + 3);
         const std::size_t valueLength = value.length() - 1;
 
@@ -101,9 +102,12 @@ public:
                     
                     tv.push_back(t);
                 } else if (startsWith(line, kwCounter)) {
-                    auto newCounter = std::stoi(line.substr(kwCounter.length + 3));
+                    auto newCounter = std::stoi(
+                        line.substr(kwCounter.length + 3)
+                    );
 
-                    // COUNT is reset to zero after transition [ENCRYPT] -> [DECRYPT]
+                    // COUNT is reset to zero after transition, i.e.
+                    // [ENCRYPT] -> [DECRYPT]
                     if (newCounter == 0 && counter >= 0) {
                         offset = counter + 1;
                     }
@@ -124,4 +128,3 @@ public:
         return true;
     }
 };
-

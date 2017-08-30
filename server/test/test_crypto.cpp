@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "testVector.hpp"
+#include "testVectorParser.hpp"
 
 #include "crypto.hpp"
 
@@ -144,10 +144,14 @@ void testTV(const std::string filename) {
 
     for (auto t : tv) {
         std::array<byte, KEY_LENGTH> key;
-        std::copy_n(std::make_move_iterator(t.key.begin()), KEY_LENGTH, key.begin());
+        std::copy_n(
+            std::make_move_iterator(t.key.begin()), KEY_LENGTH, key.begin()
+        );
 
         std::array<byte, IV_LENGTH> iv;
-        std::copy_n(std::make_move_iterator(t.iv.begin()), IV_LENGTH, iv.begin());
+        std::copy_n(
+            std::make_move_iterator(t.iv.begin()), IV_LENGTH, iv.begin()
+        );
 
         auto msg = t.plain;
         auto nChars = msg.size();
@@ -160,7 +164,8 @@ void testTV(const std::string filename) {
     }
 }
 
-std::vector<std::string> getTVFilenames(std::size_t keylength, std::size_t plainLength) {
+std::vector<std::string> getTVFilenames(std::size_t keylength,
+                                        std::size_t plainLength) {
     std::string path = "test/KAT_AES/";
     std::string prefix = std::to_string(plainLength * 8);
     std::string suffix = std::to_string(keylength * 8) + ".rsp";
