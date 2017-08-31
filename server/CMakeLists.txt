@@ -86,7 +86,7 @@ else ()
 endif ()
 
 # add crypto++ library
-find_library(CRYPTOPP_LIB crypto++)
+find_library(CRYPTOPP_LIB cryptopp)
 if (NOT CRYPTOPP_LIB)
     message(FATAL_ERROR "crypto++ library not found")
 else ()

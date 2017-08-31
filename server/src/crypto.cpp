@@ -1,5 +1,5 @@
-#include <crypto++/aes.h>
-#include <crypto++/osrng.h>
+#include <cryptopp/aes.h>
+#include <cryptopp/osrng.h>
 #include <cryptopp/modes.h>
 
 #include "crypto.hpp"
