@@ -105,25 +105,25 @@ if (GTEST_FOUND)
         "${PROJECT_BINARY_DIR}/test/KAT_AES"
     )
 
-    set(EXECUTABLE_NAME "runAllUnitTests")
+    set(EXECUTABLE_NAME_TEST "runAllUnitTests")
 
     enable_testing()
-    add_executable(${EXECUTABLE_NAME} test/main.cxx
-                                      ${UNITTEST_FILES}
-                                      ${SOURCE_FILES})
-    target_link_libraries(${EXECUTABLE_NAME} gtest)
-    add_test(NAME ${EXECUTABLE_NAME} COMMAND runUnitTests)
+    add_executable(${EXECUTABLE_NAME_TEST} test/main.cxx
+                                           ${UNITTEST_FILES}
+                                           ${SOURCE_FILES})
+    target_link_libraries(${EXECUTABLE_NAME_TEST} gtest)
+    add_test(NAME ${EXECUTABLE_NAME_TEST} COMMAND ${EXECUTABLE_NAME_TEST})
 
     # require C++14
     set_target_properties(
-        ${EXECUTABLE_NAME} PROPERTIES
+        ${EXECUTABLE_NAME_TEST} PROPERTIES
         CXX_STANDARD 14
         CXX_STANDARD_REQUIRED ON
     )
 
-    target_link_libraries(${EXECUTABLE_NAME} ${Boost_LIBRARIES})
-    target_link_libraries(${EXECUTABLE_NAME} ${CMAKE_THREAD_LIBS_INIT})
-    target_link_libraries(${EXECUTABLE_NAME} ${ZMQ_LIB})
-    target_link_libraries(${EXECUTABLE_NAME} ${CRYPTOPP_LIB})
+    target_link_libraries(${EXECUTABLE_NAME_TEST} ${Boost_LIBRARIES})
+    target_link_libraries(${EXECUTABLE_NAME_TEST} ${CMAKE_THREAD_LIBS_INIT})
+    target_link_libraries(${EXECUTABLE_NAME_TEST} ${ZMQ_LIB})
+    target_link_libraries(${EXECUTABLE_NAME_TEST} ${CRYPTOPP_LIB})
 endif ()
 
