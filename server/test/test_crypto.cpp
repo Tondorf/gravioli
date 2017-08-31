@@ -83,7 +83,7 @@ public:
     }
 
     virtual ~EncryptionAndDecryption() {
-        delete msg;
+        delete[] msg;
     }
 };
 
@@ -103,7 +103,7 @@ TEST(Encryption, isNotIdentity) {
     crypto::encrypt(msg, nChars, KEY1);
     ASSERT_FALSE(equal(msg, secrete));
 
-    delete msg;
+    delete[] msg;
 }
 
 
