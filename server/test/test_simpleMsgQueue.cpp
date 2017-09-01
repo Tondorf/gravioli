@@ -86,11 +86,17 @@ constexpr crypto::Key TESTKEY {
 
 
 TEST(SimpleMsgQueue, popsMessagesAsFIFOQueue) { 
-    byte *data1 = new byte[1];
+    byte *data1 = new byte[3];
     data1[0] = 0x01;
+    data1[1] = 0x02;
+    data1[2] = 0x03;
 
-    byte *data2 = new byte[1];
-    data2[0] = 0x02;
+    byte *data2 = new byte[5];
+    data2[0] = 0x01;
+    data2[1] = 0x02;
+    data2[2] = 0x03;
+    data2[3] = 0x04;
+    data2[4] = 0x05;
 
     server::Message *msg1 = new server::Message(TESTKEY, data1, 1);
     server::Message *msg2 = new server::Message(TESTKEY, data2, 1);
