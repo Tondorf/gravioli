@@ -96,9 +96,13 @@ endif ()
 # add Google Testing Framework and enable testing
 find_package(GTest)
 if (GTEST_FOUND)
-    set(UNITTEST_FILES test/test_userInputParser.cpp
+    include_directories("test")
+
+    set(UNITTEST_FILES test/helper.cpp
+                       test/test_userInputParser.cpp
                        test/test_crypto.cpp
-                       test/test_simpleMsgQueue.cpp)
+                       test/test_simpleMsgQueue.cpp
+                       test/test_server.cpp)
 
     configure_files(
         "${PROJECT_SOURCE_DIR}/test/KAT_AES"

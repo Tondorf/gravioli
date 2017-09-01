@@ -2,6 +2,8 @@
 
 #include "simpleMsgQueue.hpp"
 
+#include "helper.hpp"
+
 
 ::testing::AssertionResult equalAndNotNull(server::IMessage *a,
                                            server::IMessage *b) {
@@ -77,48 +79,43 @@
 }
 
 
-constexpr crypto::Key TESTKEY {
-    0x00, 0x01, 0x02, 0x03,
-    0x04, 0x05, 0x06, 0x07,
-    0x08, 0x09, 0x0a, 0x0b,
-    0x0c, 0x0d, 0x0e, 0x0f
-};
-
-
 TEST(SimpleMsgQueue, popsMessagesAsFIFOQueue) { 
-    byte *data1 = new byte[3];
-    data1[0] = 0x01;
-    data1[1] = 0x02;
-    data1[2] = 0x03;
+    using msg_t = server::IMsgQueue::Messages::msg_t;
+    using Messages = server::IMsgQueue::Messages;
 
-    byte *data2 = new byte[5];
-    data2[0] = 0x01;
-    data2[1] = 0x02;
-    data2[2] = 0x03;
-    data2[3] = 0x04;
-    data2[4] = 0x05;
+    constexpr crypto::Key TESTKEY {
+        0x00, 0x01, 0x02, 0x03,
+        0x04, 0x05, 0x06, 0x07,
+        0x08, 0x09, 0x0a, 0x0b,
+        0x0c, 0x0d, 0x0e, 0x0f
+    };
 
-    server::Message *msg1 = new server::Message(TESTKEY, data1, 1);
-    server::Message *msg2 = new server::Message(TESTKEY, data2, 1);
+    auto *msg1 = createMsg(TESTKEY, {
+        0x01, 0x02, 0x03
+    });
+    auto *msg2 = createMsg(TESTKEY, {
+        0x04, 0x05, 0x06, 0x07, 0x08
+    });
 
-    std::vector<server::IMsgQueue::Messages::msg_t> msgs1;
-    std::vector<server::IMsgQueue::Messages::msg_t> msgs2;
-
-    msgs1.push_back(std::make_pair(msg1, nullptr));
-    msgs2.push_back(std::make_pair(msg2, nullptr));
+    std::vector<msg_t> msgs1 {
+        std::make_pair(msg1, nullptr)
+    };
+    std::vector<msg_t> msgs2 {
+        std::make_pair(msg2, nullptr)
+    };
 
     auto msgs1_copy(msgs1);
     auto msgs2_copy(msgs2);
 
-    std::size_t topicID1 = 1;
-    std::size_t topicID2 = 2;
+    const std::size_t topicID1 = 1;
+    const std::size_t topicID2 = 2;
 
     server::SimpleMsgQueue msgQueue;
-    msgQueue.push(server::IMsgQueue::Messages(topicID1, std::move(msgs1)));
-    msgQueue.push(server::IMsgQueue::Messages(topicID2, std::move(msgs2)));
+    msgQueue.push(Messages(topicID1, std::move(msgs1)));
+    msgQueue.push(Messages(topicID2, std::move(msgs2)));
 
     bool success;
-    server::IMsgQueue::Messages poppedMsgs;
+    Messages poppedMsgs;
 
     success = msgQueue.pop(poppedMsgs);
     ASSERT_TRUE(success);
