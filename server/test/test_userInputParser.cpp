@@ -24,11 +24,11 @@ public:
 };
 
 
-bool parseUserInput(std::vector<const char*> &argv, Config &config) {
+inline bool parseUserInput(std::vector<const char*> &argv, Config &config) {
     return parseUserInput(argv.size(), &argv[0], config);
 }
 
-port_t getNonDefaultPort() {
+inline port_t getNonDefaultPort() {
     return DEFAULT_PORT > 10000 ? 10000 : 20000;
 }
 

@@ -5,8 +5,8 @@
 #include "helper.hpp"
 
 
-::testing::AssertionResult equalAndNotNull(server::IMessage *a,
-                                           server::IMessage *b) {
+inline ::testing::AssertionResult equalAndNotNull(server::IMessage *a,
+                                                  server::IMessage *b) {
     if (a == nullptr || b == nullptr) {
         return ::testing::AssertionFailure() <<
                "one or both are nullptr";
@@ -51,7 +51,7 @@
 }
 
 
-::testing::AssertionResult equalAndNotEmpty(
+inline ::testing::AssertionResult equalAndNotEmpty(
     std::vector<server::IMsgQueue::Messages::msg_t> a,
     std::vector<server::IMsgQueue::Messages::msg_t> b) {
 

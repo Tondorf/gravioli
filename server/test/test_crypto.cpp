@@ -39,7 +39,8 @@ constexpr crypto::IV IV2 {
 };
 
 
-byte *allocateWithoutTrailingZero(const std::string msg, std::size_t& nChars) {
+inline byte *allocateWithoutTrailingZero(const std::string msg,
+                                         std::size_t& nChars) {
     nChars = msg.length();
 
     byte *chars = new byte[nChars];
@@ -51,7 +52,8 @@ byte *allocateWithoutTrailingZero(const std::string msg, std::size_t& nChars) {
 }
 
 
-::testing::AssertionResult equal(byte *a, char *b, const std::size_t size) {
+inline ::testing::AssertionResult equal(byte *a, char *b,
+                                        const std::size_t size) {
     for (std::size_t i = 0; i < size; ++i) {
         if (a[i] != static_cast<byte>(b[i])) {
             return ::testing::AssertionFailure()
@@ -63,7 +65,7 @@ byte *allocateWithoutTrailingZero(const std::string msg, std::size_t& nChars) {
     return ::testing::AssertionSuccess();
 }
 
-::testing::AssertionResult equal(byte *a, std::string b) {
+inline ::testing::AssertionResult equal(byte *a, std::string b) {
     return equal(a, &b[0], b.length());
 }
 
@@ -136,7 +138,7 @@ TEST_F(EncryptionAndDecryption, withDifferentInitialVectorIsNotIdentity) {
 }
 
 
-void testTV(const std::string filename) {
+inline void testTV(const std::string filename) {
     std::vector<TestVector::Test> tv;
     bool success = TestVector::parseRSP(filename, tv);
     ASSERT_TRUE(success);
@@ -164,8 +166,8 @@ void testTV(const std::string filename) {
     }
 }
 
-std::vector<std::string> getTVFilenames(std::size_t keylength,
-                                        std::size_t plainLength) {
+inline std::vector<std::string> getTVFilenames(std::size_t keylength,
+                                               std::size_t plainLength) {
     std::string path = "test/KAT_AES/";
     std::string prefix = std::to_string(plainLength * 8);
     std::string suffix = std::to_string(keylength * 8) + ".rsp";
