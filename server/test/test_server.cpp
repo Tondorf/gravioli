@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <cstring>
 #include <thread>
 
 #include "simpleMsgQueue.hpp"
@@ -14,17 +15,48 @@ public:
     std::shared_ptr<server::SimpleMsgQueue> msgQueue;
     server::Server server;
     std::thread serverThread;
+    
+    void *clientContext; 
+    void *clientSocket;
 
-    Server() : msgQueue(std::make_shared<server::SimpleMsgQueue>()),
-               server(8888, msgQueue),
-               serverThread([this]() { this->server.run(); }) {
+    Server() :
+        msgQueue(std::make_shared<server::SimpleMsgQueue>()),
+        server(8888, msgQueue),
+        serverThread([this]() { this->server.run(); }),
+        clientContext(zmq_ctx_new()),
+        clientSocket(zmq_socket(clientContext, ZMQ_SUB)) {
+
+        zmq_connect(clientSocket, "tcp://localhost:8888");
     }
 
     virtual ~Server() {
+        zmq_close(clientSocket);
+        zmq_ctx_destroy(clientContext);
+
         server.stop();
         serverThread.join();
     }
+
+    bool recvNextMsgAsClient(std::vector<byte>& bytes) {
+        zmq_msg_t part;
+
+        zmq_msg_init(&part);
+        zmq_recvmsg(clientSocket, &part, 0);
+
+        const auto size = zmq_msg_size(&part);
+        bytes.reserve(size);
+        std::memcpy(bytes.data(), zmq_msg_data(&part), size);
+
+        std::int64_t more;
+        auto sizeOfMore = sizeof(more);
+        zmq_getsockopt(clientSocket, ZMQ_RCVMORE, &more, &sizeOfMore);
+
+        zmq_msg_close(&part); 
+
+        return (more != 0);
+    }
 };
+
 
 
 /*
