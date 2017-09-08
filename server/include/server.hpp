@@ -113,7 +113,7 @@ namespace server {
 
         virtual bool run();
 
-        virtual bool process();
+        virtual bool process(IMsgQueue::Messages&&);
 
         virtual void stop();
 

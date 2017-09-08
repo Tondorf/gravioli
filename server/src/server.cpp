@@ -115,9 +115,12 @@ namespace server {
         };
 
         while (!_stopped) {
-            bool rc = process();
-            if (!rc) {
-                return false;
+            IMsgQueue::Messages popped;
+            while (_msgQueue->pop(popped)) {
+                bool rc = process(std::move(popped));
+                if (!rc) {
+                    return false;
+                }
             }
 
             sleep();
@@ -127,28 +130,25 @@ namespace server {
     }
 
 
-    bool Server::process() {
-        IMsgQueue::Messages popped;
-        while (_msgQueue->pop(popped)) {
-            for (auto&& msg : popped.msgs) {
-                auto topicID = toLittleEndian(popped.topicID);
-                sendBytes(&topicID[0], topicID.size(), true);
+    bool Server::process(IMsgQueue::Messages&& popped) {
+        for (auto&& msg : popped.msgs) {
+            auto topicID = toLittleEndian(popped.topicID);
+            sendBytes(&topicID[0], topicID.size(), true);
 
-                auto&& container = std::get<0>(msg);
+            auto&& container = std::get<0>(msg);
 
-                void *memOwner = nullptr;
-                auto customFree = std::get<1>(msg);
-                if (customFree != nullptr) {
-                    memOwner = container;
-                }
+            void *memOwner = nullptr;
+            auto customFree = std::get<1>(msg);
+            if (customFree != nullptr) {
+                memOwner = container;
+            }
 
-                if (!cryptAndSendBytes(container->getBufferPointer(),
-                                       customFree,
-                                       memOwner,
-                                       container->getSize(),
-                                       container->key())) {
-                    Log::error("Error during message transmission");
-                }
+            if (!cryptAndSendBytes(container->getBufferPointer(),
+                                   customFree,
+                                   memOwner,
+                                   container->getSize(),
+                                   container->key())) {
+                Log::error("Error during message transmission");
             }
         }
 
