@@ -84,17 +84,17 @@ namespace server {
 
         std::shared_ptr<IMsgQueue> _msgQueue;
 
-        bool sendMessage(zmq_msg_t *, const std::size_t size, bool more);
+        virtual bool sendMessage(zmq_msg_t *, const std::size_t size, bool more);
 
-        bool sendBytes(byte *, const std::size_t size, bool more);
+        virtual bool sendBytes(byte *, const std::size_t size, bool more);
 
-        bool sendBytes(byte *,
+        virtual bool sendBytes(byte *,
                        CustomFreePtr_t,
                        void *memOwner,
                        const std::size_t size,
                        bool more);
 
-        bool cryptAndSendBytes(byte *, 
+        virtual bool cryptAndSendBytes(byte *, 
                                CustomFreePtr_t,
                                void *memOwner,
                                const std::size_t size,
@@ -111,11 +111,11 @@ namespace server {
 
         virtual ~Server();
 
-        bool run();
+        virtual bool run();
 
-        bool process();
+        virtual bool process();
 
-        void stop();
+        virtual void stop();
 
         template <typename T>
         static std::vector<byte> toLittleEndian(const T& x) {
