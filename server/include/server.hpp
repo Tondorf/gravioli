@@ -113,6 +113,20 @@ namespace server {
 
         bool run();
 
+        bool process();
+
         void stop();
+
+        template <typename T>
+        static std::vector<byte> toLittleEndian(const T& x) {
+            constexpr std::size_t nbytes = sizeof(x);
+            std::vector<byte> bytes(nbytes);
+            for (std::size_t i = 0; i < nbytes; ++i) {
+                auto index = nbytes - 1 - i;
+                bytes[index] = (x >> (i * 8));
+            }
+
+            return bytes;
+        }
     };
 }

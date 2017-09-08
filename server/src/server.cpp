@@ -115,39 +115,41 @@ namespace server {
         };
 
         while (!_stopped) {
-            IMsgQueue::Messages popped;
-            while (_msgQueue->pop(popped)) {
-                for (auto&& msg : popped.msgs) {
-                    { // sends topicID as byte array (little-endian)
-                        auto& topicID = popped.topicID;
-                        constexpr std::size_t nbytes = sizeof(topicID);
-                        byte topicIDAsByteArray[nbytes];
-                        for (std::size_t i = 0; i < nbytes; ++i) {
-                            auto index = nbytes - 1 - i;
-                            topicIDAsByteArray[index] = (topicID >> (i * 8));
-                        }
-                        sendBytes(topicIDAsByteArray, nbytes, true);
-                    }
-
-                    auto&& container = std::get<0>(msg);
-
-                    void *memOwner = nullptr;
-                    auto customFree = std::get<1>(msg);
-                    if (customFree != nullptr) {
-                        memOwner = container;
-                    }
-
-                    if (!cryptAndSendBytes(container->getBufferPointer(),
-                                           customFree,
-                                           memOwner,
-                                           container->getSize(),
-                                           container->key())) {
-                        Log::error("Error during message transmission");
-                    }
-                }
+            bool rc = process();
+            if (!rc) {
+                return false;
             }
 
             sleep();
+        }
+
+        return true;
+    }
+
+
+    bool Server::process() {
+        IMsgQueue::Messages popped;
+        while (_msgQueue->pop(popped)) {
+            for (auto&& msg : popped.msgs) {
+                auto topicID = toLittleEndian(popped.topicID);
+                sendBytes(&topicID[0], topicID.size(), true);
+
+                auto&& container = std::get<0>(msg);
+
+                void *memOwner = nullptr;
+                auto customFree = std::get<1>(msg);
+                if (customFree != nullptr) {
+                    memOwner = container;
+                }
+
+                if (!cryptAndSendBytes(container->getBufferPointer(),
+                                       customFree,
+                                       memOwner,
+                                       container->getSize(),
+                                       container->key())) {
+                    Log::error("Error during message transmission");
+                }
+            }
         }
 
         return true;
