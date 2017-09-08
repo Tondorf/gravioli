@@ -100,6 +100,10 @@ namespace server {
                                const std::size_t size,
                                const crypto::Key& key,
                                bool more = false);
+        
+        virtual void sleep_inner();
+
+        virtual void sleep_outer();
 
 
     public:

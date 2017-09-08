@@ -104,15 +104,20 @@ namespace server {
     }
 
 
+    void Server::sleep_inner() {
+    }
+
+
+    void Server::sleep_outer() {
+        using namespace std::chrono_literals;
+        std::this_thread::sleep_for(1s);
+    }
+
+
     bool Server::run() {
         if (!_connected) {
             return false;
         }
-
-        auto sleep = []() {
-            using namespace std::chrono_literals;
-            std::this_thread::sleep_for(1s);
-        };
 
         while (!_stopped) {
             IMsgQueue::Messages popped;
@@ -121,9 +126,11 @@ namespace server {
                 if (!rc) {
                     return false;
                 }
+
+                sleep_inner();
             }
 
-            sleep();
+            sleep_outer();
         }
 
         return true;
