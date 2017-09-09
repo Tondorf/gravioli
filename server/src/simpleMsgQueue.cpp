@@ -1,6 +1,3 @@
-#include <chrono>
-#include <thread>
-
 #include "simpleMsgQueue.hpp"
 
 #include "config.hpp"
@@ -41,21 +38,6 @@ namespace server {
     }
 
 
-    SimpleMsgQueue::~SimpleMsgQueue() {
-        using namespace std::chrono_literals;
-
-        while (currentlyAllocatedInstances.load() > 0) {
-            Log::info("Waiting until all allocated instances of MsgQueue"
-                      "are deleted: %d instances",
-                      currentlyAllocatedInstances.load());
-
-            std::this_thread::sleep_for(100ms);
-        }
-
-        Log::info("All allocated instances of MsgQueue are deleted.");
-    }
-
-
     void SimpleMsgQueue::push(Messages&& msgs) {
         _lock.lock();
         _queue.push(std::move(msgs));
@@ -64,13 +46,6 @@ namespace server {
 
 
     bool SimpleMsgQueue::pop(Messages& msgs) {
-        if (currentlyAllocatedInstances.load() 
-            > SIMULTANEOUSLY_ALLOCATED_INSTANCES_THRESHOLD) {
-            Log::error("Number of simultaneously allocated instances "
-                       "is above threshold: %d instances",
-                       currentlyAllocatedInstances.load());
-        }
-
         bool success = false;
 
         _lock.lock();
@@ -83,6 +58,4 @@ namespace server {
 
         return success;
     }
-
-    std::atomic<std::size_t> SimpleMsgQueue::currentlyAllocatedInstances(0);
 }

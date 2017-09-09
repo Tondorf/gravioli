@@ -1,6 +1,5 @@
 #pragma once
 
-#include <atomic>
 #include <mutex>
 #include <queue>
 
@@ -33,14 +32,9 @@ namespace server {
         std::queue<Messages> _queue;
         
     public:
-        static constexpr std::size_t
-        SIMULTANEOUSLY_ALLOCATED_INSTANCES_THRESHOLD = 10;
-
-        static std::atomic<std::size_t> currentlyAllocatedInstances;
-
         SimpleMsgQueue();
 
-        virtual ~SimpleMsgQueue();
+        virtual ~SimpleMsgQueue() = default;
 
         void push(Messages&&);
 
