@@ -2,8 +2,6 @@
 
 #include "config.hpp"
 
-#include "SimpleLogger/logger.hpp"
-
 
 namespace server {
     Message::Message(const crypto::Key& key, byte *data, std::size_t size):

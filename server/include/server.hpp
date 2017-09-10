@@ -84,7 +84,9 @@ namespace server {
 
         std::shared_ptr<IMsgQueue> _msgQueue;
 
-        virtual bool sendMessage(zmq_msg_t *, const std::size_t size, bool more);
+        virtual bool sendMessage(zmq_msg_t *,
+                                 const std::size_t size,
+                                 bool more);
 
         virtual bool sendBytes(byte *, const std::size_t size, bool more);
 

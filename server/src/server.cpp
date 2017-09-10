@@ -4,8 +4,6 @@
 
 #include "server.hpp"
 
-#include "crypto.hpp"
-
 #include "SimpleLogger/logger.hpp"
 
 
