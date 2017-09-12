@@ -1,4 +1,4 @@
-#include "simpleMsgQueue.hpp"
+#include "server/simpleMsgQueue.hpp"
 
 #include "config.hpp"
 

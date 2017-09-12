@@ -2,7 +2,7 @@
 
 #include <boost/program_options.hpp>
 
-#include "userInputParser.hpp"
+#include "common/userInputParser.hpp"
 
 #include "SimpleLogger/logger.hpp"
 

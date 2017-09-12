@@ -2,7 +2,7 @@
 #include <cryptopp/osrng.h>
 #include <cryptopp/modes.h>
 
-#include "crypto.hpp"
+#include "server/crypto.hpp"
 
 
 namespace crypto {

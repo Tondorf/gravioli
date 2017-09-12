@@ -6,11 +6,11 @@
 #include "SimpleLogger/logger.hpp"
 
 #include "config.hpp"
-#include "userInputParser.hpp"
 
-#include "greenwich.hpp"
-#include "server.hpp"
-#include "simpleMsgQueue.hpp"
+#include "common/userInputParser.hpp"
+#include "common/greenwich.hpp"
+#include "server/server.hpp"
+#include "server/simpleMsgQueue.hpp"
 
 
 void awaitShutdown(boost::asio::signal_set &signal,

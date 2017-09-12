@@ -47,11 +47,11 @@ include_directories("fbs")
 
 # define sources and executable
 set(EXECUTABLE_NAME "server")
-set(SOURCE_FILES src/userInputParser.cpp
-                 src/server.cpp
-                 src/greenwich.cpp
-                 src/crypto.cpp
-                 src/simpleMsgQueue.cpp)
+set(SOURCE_FILES src/common/userInputParser.cpp
+                 src/common/greenwich.cpp
+                 src/server/server.cpp
+                 src/server/crypto.cpp
+                 src/server/simpleMsgQueue.cpp)
 add_executable(${EXECUTABLE_NAME} src/main.cxx ${SOURCE_FILES})
 
 # require C++14

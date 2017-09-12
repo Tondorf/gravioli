@@ -7,7 +7,7 @@
 
 #include "SimpleLogger/logger.hpp"
 
-#include "simpleMsgQueue.hpp"
+#include "server/simpleMsgQueue.hpp"
 
 #include "helper.hpp"
 

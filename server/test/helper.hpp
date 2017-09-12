@@ -2,7 +2,7 @@
 
 #include <atomic>
 
-#include "simpleMsgQueue.hpp"
+#include "server/simpleMsgQueue.hpp"
 
 
 extern std::atomic<std::size_t> currentlyAllocatedMsgInstances;
