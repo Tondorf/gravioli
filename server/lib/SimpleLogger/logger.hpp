@@ -3,6 +3,7 @@
 #include <cstdarg>
 #include <iostream>
 #include <functional>
+#include <mutex>
 #include <string>
 
 
@@ -18,6 +19,7 @@ namespace Log {
         LogLevel _logLevel;
         bool _printTimestamp = false;
         std::function<std::string(void)> _time;
+        std::mutex _mtx;
 
         SimpleLogger() :
             _out(stdout),
@@ -80,6 +82,8 @@ namespace Log {
 
 
         void log(const LogLevel logLevel, const char *msg, va_list args) {
+            std::lock_guard<std::mutex> lock(_mtx);
+
             if (logLevel >= _logLevel) {
                 auto logLevel_str = logLevelAsString(logLevel);
                 if (_printTimestamp) {
