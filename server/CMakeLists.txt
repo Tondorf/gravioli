@@ -51,7 +51,13 @@ set(SOURCE_FILES src/common/userInputParser.cpp
                  src/common/greenwich.cpp
                  src/server/server.cpp
                  src/server/crypto.cpp
-                 src/server/simpleMsgQueue.cpp)
+                 src/server/simpleMsgQueue.cpp
+                 src/httpserver/connection.cpp
+                 src/httpserver/connectionManager.cpp
+                 src/httpserver/mimeType.cpp
+                 src/httpserver/reply.cpp
+                 src/httpserver/requestParser.cpp
+                 src/authentication/requestHandler.cpp)
 add_executable(${EXECUTABLE_NAME} src/main.cxx ${SOURCE_FILES})
 
 # require C++14
@@ -61,7 +67,17 @@ set_target_properties(
     CXX_STANDARD_REQUIRED ON
 )
 if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE STREQUAL "debug")
-    set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -pedantic")
+    set(CMAKE_CXX_FLAGS "\
+        -Wall -Wextra \
+        -Werror -pedantic \
+        -Wlogical-op \
+        -Wold-style-cast \
+        -Wuseless-cast \
+        -Wjump-misses-init \
+        -Wdouble-promotion \
+        -Wshadow \
+        -Wformat=2\
+    ")
 endif()
 
 # add Boost library
