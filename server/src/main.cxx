@@ -1,5 +1,5 @@
 #include <cstdlib>
-#include <thread>
+#include <future>
 
 #include <boost/asio.hpp>
 
@@ -11,6 +11,8 @@
 #include "common/greenwich.hpp"
 #include "server/server.hpp"
 #include "server/simpleMsgQueue.hpp"
+#include "httpserver/server.hpp"
+#include "authentication/requestHandler.hpp"
 
 
 void awaitShutdown(boost::asio::signal_set &signal,
@@ -59,26 +61,46 @@ int main(int argc, char const* argv[]) {
     using MsgQueue = server::SimpleMsgQueue;
     server::Server server(config.port, std::make_shared<MsgQueue>());
 
+    using RequestHandler = authentication::RequestHandler;
+    httpserver::Server<RequestHandler> authSrv("127.0.0.1", 8080);
+
     boost::asio::io_service ios;
     boost::asio::signal_set shutdownSignal(ios);
-    awaitShutdown(shutdownSignal, [&server](boost::system::error_code,
+    awaitShutdown(shutdownSignal, [&server, &authSrv](boost::system::error_code,
                                             int /*signo*/) {
         Log::info("Captured SIGINT, SIGTERM or SIGQUIT.");
         server.stop();
+        authSrv.stop();
     });
-    std::thread shutdownScout([&ios]() { ios.run(); });
+
+    auto serverExitedSuccessfully = std::async(
+        std::launch::async, [&server]() {
+            return server.run();
+        }
+    );
+
+    auto authSrvExitedSuccessfully = std::async(
+        std::launch::async, [&authSrv]() {
+            return authSrv.run();
+        }
+    );
 
     /*
-     * Server::run blocks as long as server is running.
-     * Server is stopped by calling Server::stop.
+     * this blocks until shutdown is triggered
      */
-    if (server.run()) {
+    ios.run();
+
+    if (serverExitedSuccessfully.get()) {
         Log::info("Stopped server successfully.");
     } else {
         Log::error("Server exited with errors!");
     }
 
-    shutdownScout.join();
+    if (authSrvExitedSuccessfully.get()) {
+        Log::info("Stopped authentication service successfully.");
+    } else {
+        Log::error("Authentication service exited with errors!");
+    }
 
     return EXIT_SUCCESS;
 }
