@@ -11,6 +11,9 @@ namespace simulation {
     private:
         const WorldInfoProvider _winfo;
         std::shared_ptr<server::IMsgQueue> _msgQueue;
+        bool _stopped;
+
+        void sleep();
 
 
     public:

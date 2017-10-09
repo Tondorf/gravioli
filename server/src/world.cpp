@@ -1,3 +1,6 @@
+#include <thread>
+
+#include "config.hpp"
 #include "server.hpp"
 
 #include "world.hpp"
@@ -9,6 +12,7 @@ namespace simulation {
                  std::shared_ptr<server::IMsgQueue> msgQueue) :
         _winfo(winfo),
         _msgQueue(msgQueue),
+        _stopped(false),
         ID(id) {
     }
 
@@ -20,11 +24,21 @@ namespace simulation {
     }
 
 
+    void World::sleep() {
+        std::this_thread::sleep_for(WORLD_SLEEP);
+    }
+
+
     bool World::run() {
+        while (!_stopped) {
+            sleep();
+        }
+
         return true;
     }
 
 
     void World::stop() {
+        _stopped = true;
     }
 }
