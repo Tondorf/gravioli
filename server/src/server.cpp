@@ -2,7 +2,7 @@
 #include <cstring>
 #include <thread>
 
-#include "server/server.hpp"
+#include "server.hpp"
 
 #include "SimpleLogger/logger.hpp"
 

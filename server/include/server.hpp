@@ -5,7 +5,7 @@
 
 #include <zmq.h>
 
-#include "server/crypto.hpp"
+#include "crypto.hpp"
 
 
 namespace server {

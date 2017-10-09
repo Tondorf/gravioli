@@ -4,7 +4,7 @@
 
 #include "testVectorParser.hpp"
 
-#include "server/crypto.hpp"
+#include "crypto.hpp"
 
 
 constexpr std::size_t KEY_LENGTH = crypto::KEY_BLOCKSIZE;
@@ -58,7 +58,8 @@ inline ::testing::AssertionResult equal(byte *a, char *b,
         if (a[i] != static_cast<byte>(b[i])) {
             return ::testing::AssertionFailure()
                 << "mismatch at postion " << i
-                << "; " << (int) a[i] << " != " << (int) b[i];
+                << "; " << static_cast<int>(a[i])
+                << " != " << static_cast<int>(b[i]);
         }
     }
 

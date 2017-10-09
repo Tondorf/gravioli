@@ -7,12 +7,12 @@
 
 #include "config.hpp"
 
-#include "common/userInputParser.hpp"
-#include "common/greenwich.hpp"
-#include "server/server.hpp"
-#include "server/simpleMsgQueue.hpp"
-#include "httpserver/server.hpp"
-#include "authentication/requestHandler.hpp"
+#include "userInputParser.hpp"
+#include "greenwich.hpp"
+#include "server.hpp"
+#include "simpleMsgQueue.hpp"
+#include "server.hpp"
+#include "world.hpp"
 
 
 void awaitShutdown(boost::asio::signal_set &signal,
@@ -56,21 +56,24 @@ int main(int argc, char const* argv[]) {
     }().c_str());
 
     Log::info("Version: %d.%d (%s)",
-              VERSION_MAJOR, VERSION_MINOR, BUILD_TYPE_AS_STRING.c_str());
+              VERSION_MAJOR, VERSION_MINOR, BUILD_TYPE_AS_STRING);
 
-    using MsgQueue = server::SimpleMsgQueue;
-    server::Server server(config.port, std::make_shared<MsgQueue>());
+    auto msgQueue = std::make_shared<server::SimpleMsgQueue>();
+    server::Server server(config.port, msgQueue);
 
-    using RequestHandler = authentication::RequestHandler;
-    httpserver::Server<RequestHandler> authSrv("127.0.0.1", 8080);
+    simulation::WorldInfoProvider winfo;
+    std::vector<simulation::World> worlds;
+    simulation::World::init(worlds, winfo, msgQueue);
 
     boost::asio::io_service ios;
     boost::asio::signal_set shutdownSignal(ios);
-    awaitShutdown(shutdownSignal, [&server, &authSrv](boost::system::error_code,
-                                            int /*signo*/) {
+    awaitShutdown(shutdownSignal, [&server, &worlds](boost::system::error_code,
+                                                     int /*signo*/) {
         Log::info("Captured SIGINT, SIGTERM or SIGQUIT.");
+        for (auto&& w : worlds) {
+            w.stop();
+        }
         server.stop();
-        authSrv.stop();
     });
 
     auto serverExitedSuccessfully = std::async(
@@ -79,27 +82,36 @@ int main(int argc, char const* argv[]) {
         }
     );
 
-    auto authSrvExitedSuccessfully = std::async(
-        std::launch::async, [&authSrv]() {
-            return authSrv.run();
-        }
-    );
+    std::vector<std::future<bool>> worldsExitStatus;
+    for (auto&& world : worlds) {
+        worldsExitStatus.push_back(std::async(
+            std::launch::async, [&world]() {
+                return world.run();
+            }
+        ));
+    }
 
     /*
      * this blocks until shutdown is triggered
      */
     ios.run();
 
+    bool allWorldsStopsSuccessfully = true;
+    for (auto&& worldExitedSuccessfully : worldsExitStatus) {
+        if (!worldExitedSuccessfully.get()) {
+            allWorldsStopsSuccessfully = false;
+        }
+    }
+    if (allWorldsStopsSuccessfully) {
+        Log::info("Stopped all worlds successfully.");
+    } else {
+        Log::error("Some of the worlds exited with errors!");
+    }
+
     if (serverExitedSuccessfully.get()) {
         Log::info("Stopped server successfully.");
     } else {
         Log::error("Server exited with errors!");
-    }
-
-    if (authSrvExitedSuccessfully.get()) {
-        Log::info("Stopped authentication service successfully.");
-    } else {
-        Log::error("Authentication service exited with errors!");
     }
 
     return EXIT_SUCCESS;

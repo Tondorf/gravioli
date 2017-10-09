@@ -47,17 +47,13 @@ include_directories("fbs")
 
 # define sources and executable
 set(EXECUTABLE_NAME "server")
-set(SOURCE_FILES src/common/userInputParser.cpp
-                 src/common/greenwich.cpp
-                 src/server/server.cpp
-                 src/server/crypto.cpp
-                 src/server/simpleMsgQueue.cpp
-                 src/httpserver/connection.cpp
-                 src/httpserver/connectionManager.cpp
-                 src/httpserver/mimeType.cpp
-                 src/httpserver/reply.cpp
-                 src/httpserver/requestParser.cpp
-                 src/authentication/requestHandler.cpp)
+set(SOURCE_FILES src/userInputParser.cpp
+                 src/greenwich.cpp
+                 src/server.cpp
+                 src/crypto.cpp
+                 src/simpleMsgQueue.cpp
+                 src/world.cpp
+                 src/worldInfoProvider.cpp)
 add_executable(${EXECUTABLE_NAME} src/main.cxx ${SOURCE_FILES})
 
 # require C++14
@@ -73,9 +69,7 @@ if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE STREQUAL "debug")
         -Wlogical-op \
         -Wold-style-cast \
         -Wuseless-cast \
-        -Wjump-misses-init \
         -Wdouble-promotion \
-        -Wshadow \
         -Wformat=2\
     ")
 endif()

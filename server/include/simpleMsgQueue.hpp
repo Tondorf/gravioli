@@ -3,7 +3,7 @@
 #include <mutex>
 #include <queue>
 
-#include "server/server.hpp"
+#include "server.hpp"
 
 
 namespace server {

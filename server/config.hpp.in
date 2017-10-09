@@ -6,9 +6,9 @@ constexpr unsigned int VERSION_MINOR = @VERSION_MINOR@;
 enum class BuildType {
     DEBUG, RELEASE
 };
-const std::string BUILD_TYPE_AS_STRING = "@CMAKE_BUILD_TYPE@";
+constexpr const char *BUILD_TYPE_AS_STRING = "@CMAKE_BUILD_TYPE@";
 const BuildType BUILD_TYPE = []() {
-    if (BUILD_TYPE_AS_STRING.compare("release") == 0) {
+    if (std::string("@CMAKE_BUILD_TYPE@").compare("release") == 0) {
         return BuildType::RELEASE;
     }
     return BuildType::DEBUG;

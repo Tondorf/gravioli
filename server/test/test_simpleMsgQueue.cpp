@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "server/simpleMsgQueue.hpp"
+#include "simpleMsgQueue.hpp"
 
 #include "helper.hpp"
 
@@ -26,7 +26,8 @@ inline ::testing::AssertionResult equalAndNotNull(server::IMessage *a,
         if (keyA[i] != keyB[i]) {
             return ::testing::AssertionFailure() << 
                    "key mismatch at postion " << i <<
-                   "; " << (int) keyA[i] << " != " << (int) keyB[i];
+                   "; " << static_cast<int>(keyA[i]) <<
+                   " != " << static_cast<int>(keyB[i]);
         }
     }
 
@@ -43,7 +44,8 @@ inline ::testing::AssertionResult equalAndNotNull(server::IMessage *a,
         if (dataPtrA[i] != dataPtrB[i]) {
             return ::testing::AssertionFailure() << 
                    "stored data mismatch at postion " << i <<
-                   "; " << (int) dataPtrA[i] << " != " << (int) dataPtrB[i];
+                   "; " << static_cast<int>(dataPtrA[i]) <<
+                   " != " << static_cast<int>(dataPtrB[i]);
         }
     }
 

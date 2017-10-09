@@ -1,7 +1,7 @@
 #include <chrono>
 #include <iomanip>
 
-#include "common/greenwich.hpp"
+#include "greenwich.hpp"
 
 #include "config.hpp"
 

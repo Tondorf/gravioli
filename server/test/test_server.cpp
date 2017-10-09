@@ -7,7 +7,7 @@
 
 #include "SimpleLogger/logger.hpp"
 
-#include "server/simpleMsgQueue.hpp"
+#include "simpleMsgQueue.hpp"
 
 #include "helper.hpp"
 
@@ -126,7 +126,8 @@ inline ::testing::AssertionResult equal(const std::vector<byte>& a,
         if (a[i] != b[i]) {
             return ::testing::AssertionFailure() << 
                    "stored data mismatch at postion " << i <<
-                   "; " << (int) a[i] << " != " << (int) b[i];
+                   "; " << static_cast<int>(a[i]) <<
+                   " != " << static_cast<int>(b[i]);
         }
     }
 
