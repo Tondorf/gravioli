@@ -67,7 +67,6 @@ if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE STREQUAL "debug")
         -Wall -Wextra \
         -Werror -pedantic \
         -Wlogical-op \
-        -Wold-style-cast \
         -Wuseless-cast \
         -Wdouble-promotion \
         -Wformat=2\
