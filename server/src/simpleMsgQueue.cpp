@@ -37,22 +37,22 @@ namespace server {
 
 
     void SimpleMsgQueue::push(Messages&& msgs) {
-        _lock.lock();
+        std::lock_guard<std::mutex> lock(_mutex);
+        
         _queue.push(std::move(msgs));
-        _lock.unlock();
     }
 
 
     bool SimpleMsgQueue::pop(Messages& msgs) {
+        std::lock_guard<std::mutex> lock(_mutex);
+
         bool success = false;
 
-        _lock.lock();
         if (!_queue.empty()) {
             msgs = std::move(_queue.front());
             _queue.pop();
             success = true;
         }
-        _lock.unlock();
 
         return success;
     }

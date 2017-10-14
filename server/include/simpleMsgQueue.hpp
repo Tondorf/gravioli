@@ -28,7 +28,7 @@ namespace server {
 
     class SimpleMsgQueue: public IMsgQueue {
     protected:
-        std::mutex _lock;
+        std::mutex _mutex;
         std::queue<Messages> _queue;
         
     public:
