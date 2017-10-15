@@ -50,6 +50,8 @@ namespace server {
 
         virtual ~IMsgQueue() = default;
 
+        virtual void push(Messages&&) = 0;
+
         virtual bool pop(Messages&) = 0;
     };
 
