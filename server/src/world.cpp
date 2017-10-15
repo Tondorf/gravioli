@@ -1,6 +1,8 @@
 #include <thread>
 
 #include "config.hpp"
+#include "fbmessage.hpp"
+#include "simpleMsgQueue.hpp"
 #include "server.hpp"
 
 #include "planet_generated.h"
@@ -10,11 +12,10 @@
 
 
 namespace simulation {
-    void customFree(void * /*data*/, void *hint) {
-        --World::currentlyAllocatedFBInstances;
+    std::atomic<std::size_t> World::currentlyAllocatedMsgInstances(0);
 
-        delete static_cast<flatbuffers::FlatBufferBuilder *>(hint);
-    }
+
+    void customFree(void *, void *);
 
 
     World::World(int id,
@@ -25,28 +26,29 @@ namespace simulation {
         _stopped(false),
         _lastAllocSize(-1),
         ID(id) {
+        Log::debug("Creating new world: #%d", id);
     }
 
 
     World::~World() {
         using namespace std::chrono_literals;
 
-        while (currentlyAllocatedFBInstances.load() > 0) {
-            Log::info("Waiting until all allocated FB instances \
-                       are deleted: %d instances",
-                      currentlyAllocatedFBInstances.load());
+        while (currentlyAllocatedMsgInstances.load() > 0) {
+            Log::info("World #%d: Waiting until all allocated Msg instances "
+                      "are deleted: %d instances",
+                      currentlyAllocatedMsgInstances.load(), ID);
 
             std::this_thread::sleep_for(1s);
         }
 
-        Log::info("All allocated FB instances are deleted.");
+        Log::info("World #%d: All allocated Msg instances are deleted.", ID);
     }
 
 
-    void World::init(std::vector<World>& worlds,
+    void World::init(std::vector<std::shared_ptr<World>>& worlds,
                      const WorldInfoProvider& winfo,
                      std::shared_ptr<server::IMsgQueue> msgQueue) {
-        worlds.push_back(World(0, winfo, msgQueue));
+        worlds.push_back(std::make_shared<World>(0, winfo, msgQueue));
     }
 
 
@@ -71,31 +73,44 @@ namespace simulation {
 
 
     void World::sendWorldToMsgQueue() {
-        flatbuffers::FlatBufferBuilder *builder;
-        if (_lastAllocSize > 0) {
-            builder = new flatbuffers::FlatBufferBuilder(_lastAllocSize);
-        } else {
-            builder = new flatbuffers::FlatBufferBuilder();
-        }
-        ++currentlyAllocatedFBInstances;
+        flatbuffers::FlatBufferBuilder *builder = [](int size) {
+            if (size > 0) {
+                return new flatbuffers::FlatBufferBuilder(size);
+            }
+            return new flatbuffers::FlatBufferBuilder();
+        }(_lastAllocSize);
 
         auto game = game::CreatePlanet(*builder, 1.f, 2.f);
 
         builder->Finish(game);
-        _lastAllocSize = static_cast<int>(builder->GetSize());
 
-        auto *data = builder->GetBufferPointer();
-        auto size = static_cast<std::size_t>(builder->GetSize());
+        const auto size = builder->GetSize();
+        _lastAllocSize = size;
 
+        constexpr crypto::Key key {
+            0x00, 0x01, 0x02, 0x03,
+            0x04, 0x05, 0x06, 0x07,
+            0x08, 0x09, 0x0a, 0x0b,
+            0x0c, 0x0d, 0x0e, 0x0f
+        };
         std::size_t topicID = 0;
-        server::IMsgQueue::Messages msg(topicID, {
-            std::make_pair(data, &customFree)
+
+        auto allocNewMsg = [](const crypto::Key& key,
+                              flatbuffers::FlatBufferBuilder *builder) {
+            ++World::currentlyAllocatedMsgInstances;
+            return new world::FBMessage(key, builder);
+        };
+        server::IMsgQueue::Messages msgs(topicID, {
+            std::make_pair(allocNewMsg(key, builder), &customFree)
         });
 
-        std::vector<server::IMsgQueue::Messages> msgs {
-            std::move(msg)
-        };
-
         _msgQueue->push(std::move(msgs));
+    }
+
+
+    void customFree(void * /*data*/, void *hint) {
+        --World::currentlyAllocatedMsgInstances;
+
+        delete static_cast<world::FBMessage *>(hint);
     }
 }

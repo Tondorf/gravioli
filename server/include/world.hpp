@@ -23,15 +23,21 @@ namespace simulation {
     public:
         const int ID;
 
-        static std::atomic<std::size_t> currentlyAllocatedFBInstances;
+        static std::atomic<std::size_t> currentlyAllocatedMsgInstances;
+
+        World() = delete;
 
         World(int id,
               const WorldInfoProvider&,
               std::shared_ptr<server::IMsgQueue>);
 
+        World(const World&) = delete;
+
+        World& operator=(const World&) = delete;
+
         virtual ~World();
         
-        static void init(std::vector<World>&,
+        static void init(std::vector<std::shared_ptr<World>>&,
                          const WorldInfoProvider&,
                          std::shared_ptr<server::IMsgQueue>);
 

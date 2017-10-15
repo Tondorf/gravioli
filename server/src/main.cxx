@@ -62,7 +62,7 @@ int main(int argc, char const* argv[]) {
     server::Server server(config.port, msgQueue);
 
     simulation::WorldInfoProvider winfo;
-    std::vector<simulation::World> worlds;
+    std::vector<std::shared_ptr<simulation::World>> worlds;
     simulation::World::init(worlds, winfo, msgQueue);
 
     boost::asio::io_service ios;
@@ -71,7 +71,7 @@ int main(int argc, char const* argv[]) {
                                                      int /*signo*/) {
         Log::info("Captured SIGINT, SIGTERM or SIGQUIT.");
         for (auto&& w : worlds) {
-            w.stop();
+            w->stop();
         }
         server.stop();
     });
@@ -85,8 +85,8 @@ int main(int argc, char const* argv[]) {
     std::vector<std::future<bool>> worldsExitStatus;
     for (auto&& world : worlds) {
         worldsExitStatus.push_back(std::async(
-            std::launch::async, [&world]() {
-                return world.run();
+            std::launch::async, [world]() {
+                return world->run();
             }
         ));
     }
