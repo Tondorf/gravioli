@@ -19,7 +19,7 @@ namespace simulation {
 
 
     World::World(int id,
-                 const WorldInfoProvider& winfo,
+                 const WorldProperties& winfo,
                  std::shared_ptr<server::IMsgQueue> msgQueue) :
         _winfo(winfo),
         _msgQueue(msgQueue),
@@ -46,7 +46,7 @@ namespace simulation {
 
 
     void World::init(std::vector<std::shared_ptr<World>>& worlds,
-                     const WorldInfoProvider& winfo,
+                     const WorldProperties& winfo,
                      std::shared_ptr<server::IMsgQueue> msgQueue) {
         worlds.push_back(std::make_shared<World>(0, winfo, msgQueue));
     }

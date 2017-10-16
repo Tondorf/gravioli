@@ -61,7 +61,7 @@ int main(int argc, char const* argv[]) {
     auto msgQueue = std::make_shared<server::SimpleMsgQueue>();
     server::Server server(config.port, msgQueue);
 
-    simulation::WorldInfoProvider winfo;
+    simulation::WorldProperties winfo;
     std::vector<std::shared_ptr<simulation::World>> worlds;
     simulation::World::init(worlds, winfo, msgQueue);
 

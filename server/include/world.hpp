@@ -4,13 +4,13 @@
 #include <memory>
 
 #include "server.hpp"
-#include "worldInfoProvider.hpp"
+#include "worldProperties.hpp"
 
 
 namespace simulation {
     class World {
     private:
-        const WorldInfoProvider _winfo;
+        const WorldProperties _winfo;
         std::shared_ptr<server::IMsgQueue> _msgQueue;
         bool _stopped;
         int _lastAllocSize;
@@ -28,7 +28,7 @@ namespace simulation {
         World() = delete;
 
         World(int id,
-              const WorldInfoProvider&,
+              const WorldProperties&,
               std::shared_ptr<server::IMsgQueue>);
 
         World(const World&) = delete;
@@ -38,7 +38,7 @@ namespace simulation {
         virtual ~World();
         
         static void init(std::vector<std::shared_ptr<World>>&,
-                         const WorldInfoProvider&,
+                         const WorldProperties&,
                          std::shared_ptr<server::IMsgQueue>);
 
         bool run();

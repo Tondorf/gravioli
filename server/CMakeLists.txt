@@ -53,7 +53,7 @@ set(SOURCE_FILES src/userInputParser.cpp
                  src/crypto.cpp
                  src/simpleMsgQueue.cpp
                  src/world.cpp
-                 src/worldInfoProvider.cpp
+                 src/worldProperties.cpp
                  src/fbmessage.cpp)
 add_executable(${EXECUTABLE_NAME} src/main.cxx ${SOURCE_FILES})
 
