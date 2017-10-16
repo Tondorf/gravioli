@@ -3,28 +3,16 @@
 namespace world {
     FBMessage::FBMessage(const crypto::Key& key,
                          flatbuffers::FlatBufferBuilder *builder):
-        _key(key),
-        _builder(builder) {
-    }
-
-
-    FBMessage::~FBMessage() {
-        delete _builder;
-        _builder = nullptr;
+        server::Message<flatbuffers::FlatBufferBuilder>(key, builder,
+        builder->GetSize(),
+        [](flatbuffers::FlatBufferBuilder *builder) {
+            delete builder;
+        }) {
     }
 
 
     byte *FBMessage::getBufferPointer() const {
-        return _builder->GetBufferPointer();
-    }
-
-
-    std::size_t FBMessage::getSize() const {
-        return _builder->GetSize();
-    }
-
-
-    const crypto::Key& FBMessage::key() const {
-        return _key;
+        using fbb_t = flatbuffers::FlatBufferBuilder;
+        return server::Message<fbb_t>::_data->GetBufferPointer();
     }
 }

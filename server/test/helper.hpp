@@ -2,11 +2,11 @@
 
 #include <atomic>
 
-#include "simpleMsgQueue.hpp"
+#include "byteMessage.hpp"
 
 
 extern std::atomic<std::size_t> currentlyAllocatedMsgInstances;
 
-server::Message *createMsg(const crypto::Key&, const std::vector<byte>&);
+ByteMessage *createMsg(const crypto::Key&, const std::vector<byte>&);
 
 void deleteMsg(void *data, void *hint);

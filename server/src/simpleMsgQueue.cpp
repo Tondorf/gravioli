@@ -4,34 +4,6 @@
 
 
 namespace server {
-    Message::Message(const crypto::Key& key, byte *data, std::size_t size):
-        _data(data),
-        _key(key),
-        _size(size) {
-    }
-
-
-    byte *Message::getBufferPointer() const {
-        return _data;
-    }
-
-
-    std::size_t Message::getSize() const {
-        return _size;
-    }
-
-
-    const crypto::Key& Message::key() const {
-        return _key;
-    }
-
-
-    Message::~Message() {
-        delete[] _data;
-        _data = nullptr;
-    }
-
-
     SimpleMsgQueue::SimpleMsgQueue() {
     }
 

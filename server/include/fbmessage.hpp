@@ -1,25 +1,18 @@
 #pragma once
 
+#include "message.hpp"
 #include "server.hpp"
 
 #include "flatbuffers/flatbuffers.h"
 
 
 namespace world {
-    class FBMessage: public server::IMessage {
-    private:
-        const crypto::Key _key;
-        flatbuffers::FlatBufferBuilder *_builder;
-
+    class FBMessage: public server::Message<flatbuffers::FlatBufferBuilder> {
     public:
-        FBMessage(const crypto::Key&, flatbuffers::FlatBufferBuilder *);
+        FBMessage(const crypto::Key&, flatbuffers::FlatBufferBuilder *builder);
 
-        virtual ~FBMessage();
+        virtual ~FBMessage() = default;
 
-        virtual byte *getBufferPointer() const;
-
-        virtual std::size_t getSize() const;
-
-        virtual const crypto::Key& key() const;
+        virtual byte *getBufferPointer() const override;
     };
 }
