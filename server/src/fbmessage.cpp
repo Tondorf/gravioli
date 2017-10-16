@@ -1,6 +1,6 @@
 #include "fbmessage.hpp"
 
-namespace world {
+namespace server {
     FBMessage::FBMessage(const crypto::Key& key,
                          flatbuffers::FlatBufferBuilder *builder):
         server::Message<flatbuffers::FlatBufferBuilder>(key, builder,

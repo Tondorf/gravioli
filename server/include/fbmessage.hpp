@@ -6,7 +6,7 @@
 #include "flatbuffers/flatbuffers.h"
 
 
-namespace world {
+namespace server {
     class FBMessage: public server::Message<flatbuffers::FlatBufferBuilder> {
     public:
         FBMessage(const crypto::Key&, flatbuffers::FlatBufferBuilder *builder);
