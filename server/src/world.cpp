@@ -73,6 +73,17 @@ namespace simulation {
 
 
     void World::sendWorldToMsgQueue() {
+        {
+            using namespace std::chrono_literals;
+            auto n = currentlyAllocatedMsgInstances.load();
+            while (n > MAX_ALLOCATED_MSG_INSTANCES) {
+                Log::error("World #%d: Currently allocated Msg instances "
+                           "above threshold: %d", ID, n);
+                std::this_thread::sleep_for(10ms);
+                n = currentlyAllocatedMsgInstances.load();
+            }
+        }
+
         flatbuffers::FlatBufferBuilder *builder = [](int size) {
             if (size > 0) {
                 return new flatbuffers::FlatBufferBuilder(size);

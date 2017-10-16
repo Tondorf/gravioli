@@ -34,3 +34,4 @@ constexpr CryptoLevel CRYPTO_LEVEL = CryptoLevel::FAST;
 using byte = std::uint8_t;
 
 constexpr std::chrono::milliseconds WORLD_SLEEP(1000);
+constexpr std::size_t MAX_ALLOCATED_MSG_INSTANCES = 10;
