@@ -54,6 +54,7 @@ set(SOURCE_FILES src/userInputParser.cpp
                  src/simpleMsgQueue.cpp
                  src/world.cpp
                  src/worldProperties.cpp
+                 src/serializableWorld.cpp
                  src/fbmessage.cpp)
 add_executable(${EXECUTABLE_NAME} src/main.cxx ${SOURCE_FILES})
 

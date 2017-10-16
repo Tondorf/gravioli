@@ -12,7 +12,7 @@
 #include "server.hpp"
 #include "simpleMsgQueue.hpp"
 #include "server.hpp"
-#include "world.hpp"
+#include "serializableWorld.hpp"
 
 
 void awaitShutdown(boost::asio::signal_set &signal,
@@ -61,9 +61,9 @@ int main(int argc, char const* argv[]) {
     auto msgQueue = std::make_shared<server::SimpleMsgQueue>();
     server::Server server(config.port, msgQueue);
 
-    simulation::WorldProperties winfo;
-    std::vector<std::shared_ptr<simulation::World>> worlds;
-    simulation::World::init(worlds, winfo, msgQueue);
+    simulation::WorldProperties wprop;
+    std::vector<std::shared_ptr<simulation::SerializableWorld>> worlds;
+    simulation::SerializableWorld::init(worlds, wprop, msgQueue);
 
     boost::asio::io_service ios;
     boost::asio::signal_set shutdownSignal(ios);
