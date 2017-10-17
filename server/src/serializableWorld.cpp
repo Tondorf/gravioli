@@ -52,8 +52,8 @@ namespace simulation {
     }
 
 
-    void SerializableWorld::loop() {
-        World::loop();
+    void SerializableWorld::loop(std::uint64_t t) {
+        World::loop(t);
         sendWorldToMsgQueue();
     }
 

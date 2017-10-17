@@ -16,7 +16,7 @@ namespace simulation {
         int _lastAllocSize;
         static std::atomic<std::size_t> currentlyAllocatedMsgInstances;
 
-        void loop() override;
+        void loop(std::uint64_t) override;
 
         void sendWorldToMsgQueue();
 

@@ -10,9 +10,7 @@ namespace simulation {
         const WorldProperties _wprop;
         bool _stopped;
 
-        virtual void loop();
-
-        virtual void sleep();
+        virtual void loop(std::uint64_t);
 
     public:
         const int ID;

@@ -14,22 +14,24 @@ namespace simulation {
     }
 
 
-    void World::sleep() {
-        std::this_thread::sleep_for(WORLD_SLEEP);
-    }
-
-
     bool World::run() {
+        std::uint64_t ticks = 0;
         while (!_stopped) {
-            loop();
-            sleep();
+            auto start = std::chrono::steady_clock::now();
+
+            loop(ticks);
+            ticks += 1;
+
+            auto end = std::chrono::steady_clock::now();
+            auto dt = end - start;
+            std::this_thread::sleep_for(WORLD_SLEEP - dt);
         }
 
         return true;
     }
 
 
-    void World::loop() {
+    void World::loop(std::uint64_t) {
     }
 
 
