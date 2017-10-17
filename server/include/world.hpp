@@ -5,10 +5,20 @@
 
 
 namespace simulation {
+    using Vec3d = std::array<double, 3>;
+
+    struct Planet {
+        Vec3d pos;
+    };
+
     class World {
     protected:
         const WorldProperties _wprop;
         bool _stopped;
+
+        std::vector<Planet> _planets;
+
+        virtual void init(std::uint64_t);
 
         virtual void loop(std::uint64_t);
 

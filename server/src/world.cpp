@@ -31,11 +31,37 @@ namespace simulation {
     }
 
 
-    void World::loop(std::uint64_t) {
+    void World::stop() {
+        _stopped = true;
     }
 
 
-    void World::stop() {
-        _stopped = true;
+    void World::init(std::uint64_t) {
+        auto newPlanet = [](double x, double y, double z) {
+            Vec3d pos{x, y, z};
+            Planet p;
+            p.pos = pos;
+            return p;
+        };
+
+        _planets.clear();
+        _planets.push_back(newPlanet(0, 0, 0));
+    }
+
+
+    void World::loop(std::uint64_t t) {
+        const auto n = _planets.size();
+
+        constexpr std::size_t x = 0;
+        constexpr std::size_t y = 1;
+        constexpr std::size_t z = 2;
+        for (std::size_t i = 0; i < n; ++i) {
+            auto phase = t / 2. * pi / 1000.;
+            phase += static_cast<double>(i) * pi / 2.1;
+
+            _planets[i].pos[x] = std::cos(phase);
+            _planets[i].pos[y] = std::sin(phase);
+            _planets[i].pos[z] = std::sin(phase + pi / 4.);
+        }
     }
 }
