@@ -18,7 +18,7 @@ namespace simulation {
 
         std::vector<Planet> _planets;
 
-        virtual void init(std::uint64_t);
+        virtual void init();
 
         virtual void loop(std::uint64_t);
 

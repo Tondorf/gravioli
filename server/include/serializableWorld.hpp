@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <memory>
+#include <random>
 
 #include "world.hpp"
 
@@ -14,6 +15,9 @@ namespace simulation {
 
         MsgQueue_ptr _msgQueue;
         int _lastAllocSize;
+        std::random_device _rnddev;
+        std::mt19937 _rndgen;
+
         static std::atomic<std::size_t> currentlyAllocatedMsgInstances;
 
         void loop(std::uint64_t) override;

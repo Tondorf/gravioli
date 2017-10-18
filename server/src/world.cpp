@@ -13,6 +13,8 @@ namespace simulation {
         _wprop(wprop),
         _stopped(false),
         ID(id) {
+
+        init();
     }
 
 
@@ -45,7 +47,7 @@ namespace simulation {
     }
 
 
-    void World::init(std::uint64_t) {
+    void World::init() {
         auto newPlanet = [](double x, double y, double z) {
             Vec3d pos{x, y, z};
             Planet p;
@@ -54,6 +56,7 @@ namespace simulation {
         };
 
         _planets.clear();
+        _planets.push_back(newPlanet(0, 0, 0));
         _planets.push_back(newPlanet(0, 0, 0));
     }
 
@@ -65,12 +68,13 @@ namespace simulation {
         constexpr std::size_t y = 1;
         constexpr std::size_t z = 2;
         for (std::size_t i = 0; i < n; ++i) {
-            auto phase = t / 2. * pi / 1000.;
-            phase += static_cast<double>(i) * pi / 2.1;
+            auto phase1 = static_cast<double>(t) / 2. * pi / 1000.;
+            auto phase2 = static_cast<double>(t) / 2. * pi / 2000.;
+            auto phase3 = static_cast<double>(t) / 2. * pi / 3000.;
 
-            _planets[i].pos[x] = std::cos(phase);
-            _planets[i].pos[y] = std::sin(phase);
-            _planets[i].pos[z] = std::sin(phase + pi / 4.);
+            _planets[i].pos[x] = std::sin(phase1) + static_cast<double>(2 * i);
+            _planets[i].pos[y] = std::sin(phase2);
+            _planets[i].pos[z] = std::sin(phase3);
         }
     }
 }

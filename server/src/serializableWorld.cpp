@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <thread>
 
 #include "SimpleLogger/logger.hpp"
@@ -24,8 +25,9 @@ namespace simulation {
                                          MsgQueue_ptr msgQueue) :
         World(id, wprop),
         _msgQueue(msgQueue),
-        _lastAllocSize(-1) {
-    }
+        _lastAllocSize(-1),
+        _rndgen(_rnddev()) {
+     }
 
 
     SerializableWorld::~SerializableWorld() {
@@ -84,8 +86,22 @@ namespace simulation {
             return new flatbuffers::FlatBufferBuilder();
         }(_lastAllocSize);
 
-        auto game = game::CreatePlanet(*builder, 1.f, 2.f);
+        std::vector<flatbuffers::Offset<game::Planet>> planets;
+        planets.reserve(_planets.size());
+        for (auto&& p: _planets) {
+            auto x = static_cast<float>(p.pos[0]);
+            auto y = static_cast<float>(p.pos[1]);
+            auto z = static_cast<float>(p.pos[2]);
+            planets.push_back(
+                game::CreatePlanet(*builder, x, y, z)
+            );
+        }
+        shuffle(planets.begin(), planets.end(), _rndgen);
 
+        auto game = game::CreatePlanets(
+            *builder,
+            builder->CreateVector(planets)
+        );
         builder->Finish(game);
 
         const auto size = builder->GetSize();

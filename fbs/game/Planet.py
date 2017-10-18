@@ -19,20 +19,28 @@ class Planet(object):
         self._tab = flatbuffers.table.Table(buf, pos)
 
     # Planet
-    def Mass(self):
+    def X(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(4))
         if o != 0:
             return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
         return 0.0
 
     # Planet
-    def Radius(self):
+    def Y(self):
         o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(6))
         if o != 0:
             return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
         return 0.0
 
-def PlanetStart(builder): builder.StartObject(2)
-def PlanetAddMass(builder, mass): builder.PrependFloat32Slot(0, mass, 0.0)
-def PlanetAddRadius(builder, radius): builder.PrependFloat32Slot(1, radius, 0.0)
+    # Planet
+    def Z(self):
+        o = flatbuffers.number_types.UOffsetTFlags.py_type(self._tab.Offset(8))
+        if o != 0:
+            return self._tab.Get(flatbuffers.number_types.Float32Flags, o + self._tab.Pos)
+        return 0.0
+
+def PlanetStart(builder): builder.StartObject(3)
+def PlanetAddX(builder, x): builder.PrependFloat32Slot(0, x, 0.0)
+def PlanetAddY(builder, y): builder.PrependFloat32Slot(1, y, 0.0)
+def PlanetAddZ(builder, z): builder.PrependFloat32Slot(2, z, 0.0)
 def PlanetEnd(builder): return builder.EndObject()

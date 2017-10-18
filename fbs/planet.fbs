@@ -1,8 +1,13 @@
 namespace game;
 
 table Planet {
-    mass: float;
-    radius: float;
+    x: float;
+    y: float;
+    z: float;
 }
 
-root_type Planet;
+table Planets {
+    planets: [Planet];
+}
+
+root_type Planets;

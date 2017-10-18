@@ -10,21 +10,28 @@ namespace game {
 
 struct Planet;
 
+struct Planets;
+
 struct Planet FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_MASS = 4,
-    VT_RADIUS = 6
+    VT_X = 4,
+    VT_Y = 6,
+    VT_Z = 8
   };
-  float mass() const {
-    return GetField<float>(VT_MASS, 0.0f);
+  float x() const {
+    return GetField<float>(VT_X, 0.0f);
   }
-  float radius() const {
-    return GetField<float>(VT_RADIUS, 0.0f);
+  float y() const {
+    return GetField<float>(VT_Y, 0.0f);
+  }
+  float z() const {
+    return GetField<float>(VT_Z, 0.0f);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<float>(verifier, VT_MASS) &&
-           VerifyField<float>(verifier, VT_RADIUS) &&
+           VerifyField<float>(verifier, VT_X) &&
+           VerifyField<float>(verifier, VT_Y) &&
+           VerifyField<float>(verifier, VT_Z) &&
            verifier.EndTable();
   }
 };
@@ -32,11 +39,14 @@ struct Planet FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct PlanetBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_mass(float mass) {
-    fbb_.AddElement<float>(Planet::VT_MASS, mass, 0.0f);
+  void add_x(float x) {
+    fbb_.AddElement<float>(Planet::VT_X, x, 0.0f);
   }
-  void add_radius(float radius) {
-    fbb_.AddElement<float>(Planet::VT_RADIUS, radius, 0.0f);
+  void add_y(float y) {
+    fbb_.AddElement<float>(Planet::VT_Y, y, 0.0f);
+  }
+  void add_z(float z) {
+    fbb_.AddElement<float>(Planet::VT_Z, z, 0.0f);
   }
   PlanetBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -44,7 +54,7 @@ struct PlanetBuilder {
   }
   PlanetBuilder &operator=(const PlanetBuilder &);
   flatbuffers::Offset<Planet> Finish() {
-    const auto end = fbb_.EndTable(start_, 2);
+    const auto end = fbb_.EndTable(start_, 3);
     auto o = flatbuffers::Offset<Planet>(end);
     return o;
   }
@@ -52,26 +62,78 @@ struct PlanetBuilder {
 
 inline flatbuffers::Offset<Planet> CreatePlanet(
     flatbuffers::FlatBufferBuilder &_fbb,
-    float mass = 0.0f,
-    float radius = 0.0f) {
+    float x = 0.0f,
+    float y = 0.0f,
+    float z = 0.0f) {
   PlanetBuilder builder_(_fbb);
-  builder_.add_radius(radius);
-  builder_.add_mass(mass);
+  builder_.add_z(z);
+  builder_.add_y(y);
+  builder_.add_x(x);
   return builder_.Finish();
 }
 
-inline const game::Planet *GetPlanet(const void *buf) {
-  return flatbuffers::GetRoot<game::Planet>(buf);
+struct Planets FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_PLANETS = 4
+  };
+  const flatbuffers::Vector<flatbuffers::Offset<Planet>> *planets() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<Planet>> *>(VT_PLANETS);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_PLANETS) &&
+           verifier.Verify(planets()) &&
+           verifier.VerifyVectorOfTables(planets()) &&
+           verifier.EndTable();
+  }
+};
+
+struct PlanetsBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_planets(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Planet>>> planets) {
+    fbb_.AddOffset(Planets::VT_PLANETS, planets);
+  }
+  PlanetsBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  PlanetsBuilder &operator=(const PlanetsBuilder &);
+  flatbuffers::Offset<Planets> Finish() {
+    const auto end = fbb_.EndTable(start_, 1);
+    auto o = flatbuffers::Offset<Planets>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<Planets> CreatePlanets(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Planet>>> planets = 0) {
+  PlanetsBuilder builder_(_fbb);
+  builder_.add_planets(planets);
+  return builder_.Finish();
 }
 
-inline bool VerifyPlanetBuffer(
+inline flatbuffers::Offset<Planets> CreatePlanetsDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<flatbuffers::Offset<Planet>> *planets = nullptr) {
+  return game::CreatePlanets(
+      _fbb,
+      planets ? _fbb.CreateVector<flatbuffers::Offset<Planet>>(*planets) : 0);
+}
+
+inline const game::Planets *GetPlanets(const void *buf) {
+  return flatbuffers::GetRoot<game::Planets>(buf);
+}
+
+inline bool VerifyPlanetsBuffer(
     flatbuffers::Verifier &verifier) {
-  return verifier.VerifyBuffer<game::Planet>(nullptr);
+  return verifier.VerifyBuffer<game::Planets>(nullptr);
 }
 
-inline void FinishPlanetBuffer(
+inline void FinishPlanetsBuffer(
     flatbuffers::FlatBufferBuilder &fbb,
-    flatbuffers::Offset<game::Planet> root) {
+    flatbuffers::Offset<game::Planets> root) {
   fbb.Finish(root);
 }
 
