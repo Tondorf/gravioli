@@ -3,7 +3,7 @@
 
 #include "SimpleLogger/logger.hpp"
 
-#include "planet_generated.h"
+#include "world_generated.h"
 
 #include "fbmessage.hpp"
 #include "simpleMsgQueue.hpp"

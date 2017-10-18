@@ -1,4 +1,4 @@
-mainFBS = planet.fbs
+mainFBS = world.fbs
 cpps = $(wildcard *_generated.h)
 pythons = game
 
