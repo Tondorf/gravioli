@@ -17,4 +17,4 @@ install: fbs
 
 clean:
 	rm $(cpps)
-	rm $(pythons)
+	rm -r $(pythons)
