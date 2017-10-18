@@ -64,7 +64,7 @@ set_target_properties(
     CXX_STANDARD 14
     CXX_STANDARD_REQUIRED ON
 )
-if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE STREQUAL "debug")
+if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE STREQUAL "debug")
     set(CMAKE_CXX_FLAGS "\
         -Wall -Wextra \
         -Werror -pedantic \
@@ -73,7 +73,7 @@ if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE STREQUAL "debug")
         -Wdouble-promotion \
         -Wformat=2\
     ")
-endif()
+endif ()
 
 # add Boost library
 find_package(Boost COMPONENTS system thread program_options REQUIRED)
