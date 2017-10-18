@@ -70,7 +70,7 @@ namespace simulation {
             using namespace std::chrono_literals;
             auto n = currentlyAllocatedMsgInstances.load();
             while (n > MAX_ALLOCATED_MSG_INSTANCES) {
-                Log::error("World #%d: Currently allocated Msg instances "
+                Log::error("World #%d: Currently allocated message instances "
                            "above threshold: %d", ID, n);
                 std::this_thread::sleep_for(10ms);
                 n = currentlyAllocatedMsgInstances.load();
