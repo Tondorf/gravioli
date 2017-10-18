@@ -29,17 +29,24 @@ namespace simulation {
 
 
     SerializableWorld::~SerializableWorld() {
-        using namespace std::chrono_literals;
-
-        while (currentlyAllocatedMsgInstances.load() > 0) {
-            Log::info("World #%d: Waiting until all allocated Msg instances "
-                      "are deleted: %d instances",
-                      currentlyAllocatedMsgInstances.load(), ID);
-
-            std::this_thread::sleep_for(1s);
+        server::IMsgQueue::Messages popped;
+        while (_msgQueue->pop(popped)) {
+            for (auto&& msg : popped.msgs) {
+                auto customFree = std::get<1>(msg);
+                if (customFree != nullptr) {
+                    void *memOwner = std::get<0>(msg);
+                    customFree(nullptr, memOwner);
+                }
+            }
         }
 
-        Log::info("World #%d: All allocated Msg instances are deleted.", ID);
+        auto n = currentlyAllocatedMsgInstances.load();
+        if (n > 0) {
+            Log::error("World #%d: Found %d dangling messages. "
+                       "This is a memory leak!", ID, n);
+        } else {
+            Log::info("World #%d: All allocated messages are deleted.", ID);
+        }
     }
 
 

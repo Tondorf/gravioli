@@ -69,6 +69,16 @@ int main(int argc, char const* argv[]) {
     boost::asio::signal_set shutdownSignal(ios);
     awaitShutdown(shutdownSignal, [&server, &worlds](boost::system::error_code,
                                                      int /*signo*/) {
+
+        /*
+         * ATTENTION: sequence does matter!
+         *
+         * 1st: stop all worlds
+         * 2nd: stop server
+         *
+         * Otherwise worlds will continue to send to message queue
+         * and pointers will dangle!
+         */
         Log::info("Captured SIGINT, SIGTERM or SIGQUIT.");
         for (auto&& w : worlds) {
             w->stop();

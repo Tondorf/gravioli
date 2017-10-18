@@ -1,5 +1,7 @@
 #include <thread>
 
+#include "SimpleLogger/logger.hpp"
+
 #include "config.hpp"
 #include "server.hpp"
 
@@ -17,14 +19,21 @@ namespace simulation {
     bool World::run() {
         std::uint64_t ticks = 0;
         while (!_stopped) {
-            auto start = std::chrono::steady_clock::now();
+            auto start = std::chrono::high_resolution_clock::now();
 
             loop(ticks);
             ticks += 1;
 
-            auto end = std::chrono::steady_clock::now();
-            auto dt = end - start;
-            std::this_thread::sleep_for(WORLD_SLEEP - dt);
+            auto end = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double, std::milli> dt = end - start;
+
+            std::chrono::duration<double, std::milli> sleep = WORLD_SLEEP - dt;
+            if (sleep.count() < 0) {
+                Log::error("World #%d: loop evaluation is too time consuming! "
+                           "Last iteration took %.0f ms.", ID, dt.count());
+            } else {
+                std::this_thread::sleep_for(sleep);
+            }
         }
 
         return true;
