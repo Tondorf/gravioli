@@ -2,6 +2,8 @@
 
 #include "SimpleLogger/logger.hpp"
 
+#include "world_generated.h"
+
 #include "config.hpp"
 #include "server.hpp"
 
@@ -9,7 +11,8 @@
 
 
 namespace simulation {
-    World::World(int id, const WorldProperties& wprop) :
+    World::World(int id, std::shared_ptr<WorldProperties> wprop) :
+        _rndgen(_rnddev()),
         _wprop(wprop),
         _stopped(false),
         ID(id) {
@@ -76,5 +79,30 @@ namespace simulation {
             _planets[i].pos[y] = std::sin(phase2);
             _planets[i].pos[z] = std::sin(phase3);
         }
+    }
+
+
+    void World::serializeWorldForUser(
+        std::shared_ptr<User> /*user*/,
+        flatbuffers::FlatBufferBuilder *builder) {
+
+        std::vector<flatbuffers::Offset<game::Planet>> planets;
+        planets.reserve(_planets.size());
+        for (auto&& p: _planets) {
+            auto x = static_cast<float>(p.pos[0]);
+            auto y = static_cast<float>(p.pos[1]);
+            auto z = static_cast<float>(p.pos[2]);
+            planets.push_back(
+                game::CreatePlanet(*builder, x, y, z)
+            );
+        }
+        shuffle(planets.begin(), planets.end(), _rndgen);
+
+        auto game = game::CreatePlanets(
+            *builder,
+            builder->CreateVector(planets)
+        );
+
+        builder->Finish(game);
     }
 }

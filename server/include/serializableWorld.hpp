@@ -1,8 +1,6 @@
 #pragma once
 
 #include <atomic>
-#include <memory>
-#include <random>
 
 #include "world.hpp"
 
@@ -15,8 +13,6 @@ namespace simulation {
 
         MsgQueue_ptr _msgQueue;
         int _lastAllocSize;
-        std::random_device _rnddev;
-        std::mt19937 _rndgen;
 
         static std::atomic<std::size_t> currentlyAllocatedMsgInstances;
 
@@ -28,13 +24,13 @@ namespace simulation {
 
     public:
         SerializableWorld(int id,
-                          const WorldProperties&,
+                          std::shared_ptr<WorldProperties>,
                           MsgQueue_ptr msgQueue);
 
         virtual ~SerializableWorld();
 
         static void init(std::vector<SerializableWorld_ptr>&,
-                         const WorldProperties&,
+                         std::shared_ptr<WorldProperties>,
                          MsgQueue_ptr);
     };
 }

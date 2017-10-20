@@ -1,7 +1,13 @@
 #pragma once
 
+#include <memory>
+#include <random>
+
+#include "user.hpp"
 #include "server.hpp"
 #include "worldProperties.hpp"
+
+#include "flatbuffers/flatbuffers.h"
 
 
 namespace simulation {
@@ -12,22 +18,29 @@ namespace simulation {
     };
 
     class World {
-    protected:
-        const WorldProperties _wprop;
-        bool _stopped;
+    private:
+        std::random_device _rnddev;
+        std::mt19937 _rndgen;
 
         std::vector<Planet> _planets;
+
+    protected:
+        std::shared_ptr<WorldProperties> _wprop;
+        bool _stopped;
 
         virtual void init();
 
         virtual void loop(std::uint64_t);
+
+        virtual void serializeWorldForUser(std::shared_ptr<User>,
+                                           flatbuffers::FlatBufferBuilder *);
 
     public:
         const int ID;
 
         World() = delete;
 
-        World(int id, const WorldProperties&);
+        World(int id, std::shared_ptr<WorldProperties>);
 
         World(const World&) = delete;
 

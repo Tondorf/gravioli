@@ -61,7 +61,7 @@ int main(int argc, char const* argv[]) {
     auto msgQueue = std::make_shared<server::SimpleMsgQueue>();
     server::Server server(config.port, msgQueue);
 
-    simulation::WorldProperties wprop;
+    auto wprop = std::make_shared<simulation::WorldProperties>();
     std::vector<std::shared_ptr<simulation::SerializableWorld>> worlds;
     simulation::SerializableWorld::init(worlds, wprop, msgQueue);
 
