@@ -14,7 +14,7 @@ def client(port):
     context = zmq.Context()
     socket = context.socket(zmq.SUB)
     socket.connect('tcp://127.0.0.1:{}'.format(port))
-    socket.setsockopt_string(zmq.SUBSCRIBE, '')
+    socket.setsockopt(zmq.SUBSCRIBE, b'\x00\x00\x00\x00')
 
     running = True
 
