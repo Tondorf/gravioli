@@ -3,9 +3,9 @@
 #include <memory>
 #include <random>
 
-#include "user.hpp"
+#include "player.hpp"
 #include "server.hpp"
-#include "worldProperties.hpp"
+#include "playerProvider.hpp"
 
 #include "flatbuffers/flatbuffers.h"
 
@@ -25,22 +25,22 @@ namespace simulation {
         std::vector<Planet> _planets;
 
     protected:
-        std::shared_ptr<WorldProperties> _wprop;
+        std::shared_ptr<PlayerProvider> _playerProvider;
         bool _stopped;
 
         virtual void init();
 
         virtual void loop(std::uint64_t);
 
-        virtual void serializeWorldForUser(std::shared_ptr<User>,
-                                           flatbuffers::FlatBufferBuilder *);
+        virtual void serializeWorldForPlayer(std::shared_ptr<Player>,
+                                             flatbuffers::FlatBufferBuilder *);
 
     public:
         const int ID;
 
         World() = delete;
 
-        World(int id, std::shared_ptr<WorldProperties>);
+        World(int id, std::shared_ptr<PlayerProvider>);
 
         World(const World&) = delete;
 

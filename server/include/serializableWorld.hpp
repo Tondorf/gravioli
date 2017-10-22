@@ -24,13 +24,11 @@ namespace simulation {
 
     public:
         SerializableWorld(int id,
-                          std::shared_ptr<WorldProperties>,
+                          std::shared_ptr<PlayerProvider>,
                           MsgQueue_ptr msgQueue);
 
         virtual ~SerializableWorld();
 
-        static void init(std::vector<SerializableWorld_ptr>&,
-                         std::shared_ptr<WorldProperties>,
-                         MsgQueue_ptr);
+        static void init(std::vector<SerializableWorld_ptr>&, MsgQueue_ptr);
     };
 }

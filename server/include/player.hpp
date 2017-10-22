@@ -4,15 +4,15 @@
 
 
 namespace simulation {
-    class User {
+    class Player {
     private:
         const std::uint64_t ID;
         const crypto::Key _key;
 
     public:
-        User(std::uint64_t, const crypto::Key&);
+        Player(std::uint64_t, const crypto::Key&);
 
-        virtual ~User() = default;
+        virtual ~Player() = default;
 
         std::uint64_t getID() const;
 

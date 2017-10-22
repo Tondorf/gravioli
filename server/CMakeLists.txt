@@ -53,10 +53,10 @@ set(SOURCE_FILES src/userInputParser.cpp
                  src/crypto.cpp
                  src/simpleMsgQueue.cpp
                  src/world.cpp
-                 src/worldProperties.cpp
+                 src/playerProvider.cpp
                  src/serializableWorld.cpp
                  src/fbmessage.cpp
-                 src/user.cpp)
+                 src/player.cpp)
 add_executable(${EXECUTABLE_NAME} src/main.cxx ${SOURCE_FILES})
 
 # require C++14

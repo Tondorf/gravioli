@@ -1,3 +1,4 @@
+#include <future>
 #include <thread>
 
 #include "SimpleLogger/logger.hpp"
@@ -11,9 +12,9 @@
 
 
 namespace simulation {
-    World::World(int id, std::shared_ptr<WorldProperties> wprop) :
+    World::World(int id, std::shared_ptr<PlayerProvider> playerProvider) :
         _rndgen(_rnddev()),
-        _wprop(wprop),
+        _playerProvider(playerProvider),
         _stopped(false),
         ID(id) {
 
@@ -22,6 +23,12 @@ namespace simulation {
 
 
     bool World::run() {
+        auto playerProviderExitedSuccessfully = std::async(std::launch::async,
+            [playerProvider=_playerProvider]() {
+                return playerProvider->run();
+            }
+        );
+
         std::uint64_t ticks = 0;
         while (!_stopped) {
             auto start = std::chrono::high_resolution_clock::now();
@@ -41,11 +48,20 @@ namespace simulation {
             }
         }
 
-        return true;
+        bool playerProviderExitStatus = playerProviderExitedSuccessfully.get();
+        if (playerProviderExitStatus) {
+            Log::info("Stopped player provider successfully.");
+        } else {
+            Log::error("Player provider exited with errors!");
+        }
+
+        return playerProviderExitStatus;
     }
 
 
     void World::stop() {
+        _playerProvider->stop();
+
         _stopped = true;
     }
 
@@ -82,8 +98,8 @@ namespace simulation {
     }
 
 
-    void World::serializeWorldForUser(
-        std::shared_ptr<User> /*user*/,
+    void World::serializeWorldForPlayer(
+        std::shared_ptr<Player> /*player*/,
         flatbuffers::FlatBufferBuilder *builder) {
 
         std::vector<flatbuffers::Offset<game::Planet>> planets;

@@ -25,7 +25,7 @@ namespace server {
         struct Messages {
             using msg_t = std::pair<IMessage *, CustomFreePtr_t>;
 
-            std::size_t topicID;
+            std::uint32_t topicID;
             std::vector<msg_t> msgs;
 
             Messages(): topicID(0) {

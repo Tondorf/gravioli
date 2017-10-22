@@ -61,9 +61,8 @@ int main(int argc, char const* argv[]) {
     auto msgQueue = std::make_shared<server::SimpleMsgQueue>();
     server::Server server(config.port, msgQueue);
 
-    auto wprop = std::make_shared<simulation::WorldProperties>();
     std::vector<std::shared_ptr<simulation::SerializableWorld>> worlds;
-    simulation::SerializableWorld::init(worlds, wprop, msgQueue);
+    simulation::SerializableWorld::init(worlds, msgQueue);
 
     boost::asio::io_service ios;
     boost::asio::signal_set shutdownSignal(ios);

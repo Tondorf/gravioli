@@ -18,10 +18,12 @@ namespace simulation {
     void customFree(void *, void *);
 
 
-    SerializableWorld::SerializableWorld(int id,
-                                         std::shared_ptr<WorldProperties> wprop,
-                                         MsgQueue_ptr msgQueue) :
-        World(id, wprop),
+    SerializableWorld::SerializableWorld(
+        int id,
+        std::shared_ptr<PlayerProvider> playerProvider,
+        MsgQueue_ptr msgQueue) :
+
+        World(id, playerProvider),
         _msgQueue(msgQueue),
         _lastAllocSize(-1) {
      }
@@ -50,11 +52,13 @@ namespace simulation {
 
 
     void SerializableWorld::init(std::vector<SerializableWorld_ptr>& worlds,
-                                 std::shared_ptr<WorldProperties> wprop,
                                  MsgQueue_ptr msgQueue) {
-        worlds.push_back(
-            std::make_shared<SerializableWorld>(0, wprop, msgQueue)
-        );
+        auto newWorld = [&msgQueue](int id) {
+            auto&& playerProvider = std::make_shared<PlayerProvider>();
+            return std::make_shared<SerializableWorld>(id, playerProvider, 
+                                                       msgQueue);
+        };
+        worlds.push_back(newWorld(0));
     }
 
 
@@ -81,7 +85,7 @@ namespace simulation {
             ++SerializableWorld::currentlyAllocatedMsgInstances;
             return new server::FBMessage(key, builder);
         };
-        for (auto&& user : _wprop->getUsers()) {
+        for (auto&& player : _playerProvider->getPlayers()) {
             flatbuffers::FlatBufferBuilder *builder = [](int size) {
                 if (size > 0) {
                     return new flatbuffers::FlatBufferBuilder(size);
@@ -89,13 +93,13 @@ namespace simulation {
                 return new flatbuffers::FlatBufferBuilder();
             }(_lastAllocSize);
 
-            serializeWorldForUser(std::move(user), builder);
+            serializeWorldForPlayer(std::move(player), builder);
 
             const auto size = builder->GetSize();
             _lastAllocSize = size;
 
-            const auto&& topicID = user->getID();
-            auto&& key = user->getKey();
+            const auto&& topicID = player->getID();
+            auto&& key = player->getKey();
 
             server::IMsgQueue::Messages msgs(topicID, {
                 std::make_pair(allocNewMsg(key, builder), &customFree)
