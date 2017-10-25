@@ -57,7 +57,8 @@ set(SOURCE_FILES src/userInputParser.cpp
                  src/playerProvider.cpp
                  src/serializableWorld.cpp
                  src/fbmessage.cpp
-                 src/player.cpp)
+                 src/player.cpp
+                 src/webclient.cpp)
 add_executable(${EXECUTABLE_NAME} src/main.cxx ${SOURCE_FILES})
 
 # require C++14
