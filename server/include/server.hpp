@@ -6,6 +6,7 @@
 #include <zmq.h>
 
 #include "crypto.hpp"
+#include "runnable.hpp"
 
 
 namespace server {
@@ -75,10 +76,9 @@ namespace server {
      * The design of raw function pointers and void pointers originates from the
      * zmq API.
      */
-    class Server {
+    class Server: public utils::Runnable {
     private:
         bool _connected;
-        bool _stopped;
         const port_t _port;
 
         void *_context;
@@ -105,9 +105,7 @@ namespace server {
                                const crypto::Key& key,
                                bool more = false);
         
-        virtual void sleep_inner();
-
-        virtual void sleep_outer();
+        virtual void sleep();
 
 
     public:
@@ -119,11 +117,13 @@ namespace server {
 
         virtual ~Server();
 
-        virtual bool run();
+        virtual bool run() override;
+
+        virtual bool loop() override;
 
         virtual bool process(IMsgQueue::Messages&&);
 
-        virtual void stop();
+        virtual void stop() override;
 
         template <typename T>
         static std::vector<byte> toLittleEndian(const T& x) {

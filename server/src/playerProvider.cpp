@@ -7,24 +7,16 @@
 
 namespace simulation {
     PlayerProvider::PlayerProvider():
-        _playerDataStatus(PlayerDataStatus::AWAIT_NEW_DATA),
-        _stopped(false) {
+        _playerDataStatus(PlayerDataStatus::AWAIT_NEW_DATA) {
     }
 
 
-    bool PlayerProvider::run() {
-        while (!_stopped) {
-            updatePlayers();
+    bool PlayerProvider::loop() {
+        updatePlayers();
 
-            std::this_thread::sleep_for(USER_SYNC_SLEEP);
-        }
+        std::this_thread::sleep_for(USER_SYNC_SLEEP);
 
         return true;
-    }
-
-
-    void PlayerProvider::stop() {
-        _stopped = true;
     }
 
 

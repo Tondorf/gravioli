@@ -49,6 +49,7 @@ include_directories("fbs")
 set(EXECUTABLE_NAME "server")
 set(SOURCE_FILES src/userInputParser.cpp
                  src/greenwich.cpp
+                 src/runnable.cpp
                  src/server.cpp
                  src/crypto.cpp
                  src/simpleMsgQueue.cpp

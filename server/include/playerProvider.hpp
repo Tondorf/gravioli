@@ -5,18 +5,17 @@
 #include <vector>
 
 #include "player.hpp"
+#include "runnable.hpp"
 
 
 namespace simulation {
-    class PlayerProvider {
+    class PlayerProvider: public utils::Runnable {
     private:
         enum class PlayerDataStatus {
             AWAIT_NEW_DATA, NEW_DATA_READY
         } _playerDataStatus;
 
         std::mutex _mutex;
-
-        bool _stopped;
 
         std::vector<std::shared_ptr<Player>> _players;
         std::vector<std::shared_ptr<Player>> _updatedPlayers;
@@ -30,9 +29,7 @@ namespace simulation {
 
         PlayerProvider& operator=(const PlayerProvider&) = delete;
 
-        bool run();
-
-        void stop();
+        bool loop() override;
 
         void updatePlayers();
 

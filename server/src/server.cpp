@@ -78,7 +78,6 @@ namespace server {
 
     Server::Server(port_t port, std::shared_ptr<IMsgQueue> msgQueue):
         _connected(false),
-        _stopped(false),
         _port(port),
         _context(zmq_ctx_new()),
         _publisher(zmq_socket(_context, ZMQ_PUB)),
@@ -102,32 +101,27 @@ namespace server {
     }
 
 
-    void Server::sleep_inner() {
-    }
-
-
-    void Server::sleep_outer() {
-        std::this_thread::sleep_for(SERVER_SLEEP);
-    }
-
-
     bool Server::run() {
         if (!_connected) {
             return false;
         }
 
-        while (!_stopped) {
-            IMsgQueue::Messages popped;
-            while (_msgQueue->pop(popped)) {
-                bool rc = process(std::move(popped));
-                if (!rc) {
-                    return false;
-                }
+        return utils::Runnable::run();
+    }
 
-                sleep_inner();
+
+    void Server::sleep() {
+        std::this_thread::sleep_for(SERVER_SLEEP);
+    }
+
+
+    bool Server::loop() {
+        IMsgQueue::Messages popped;
+        while (_msgQueue->pop(popped)) {
+            bool rc = process(std::move(popped));
+            if (!rc) {
+                return false;
             }
-
-            sleep_outer();
         }
 
         return true;
@@ -162,6 +156,7 @@ namespace server {
 
     void Server::stop() {
         Log::info("Stopping server ...");
-        _stopped = true;
+
+        utils::Runnable::stop();
     }
 }
