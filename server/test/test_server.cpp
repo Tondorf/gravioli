@@ -34,6 +34,10 @@ public:
 
     virtual ~TestServer() = default;
 
+    void sleep() override {
+        std::this_thread::sleep_for(100ms);
+    }
+
     bool process(server::IMsgQueue::Messages&& popped) override {
         _counter += 1;
         Log::debug("Server processes message #%d", _counter);
@@ -60,7 +64,7 @@ public:
         /*
          * Sleep for a short period of time to prevent slow starter syndrome
          */
-        std::this_thread::sleep_for(1s);
+        std::this_thread::sleep_for(100ms);
         zmq_connect(clientSocket, "tcp://localhost:8888");
         zmq_setsockopt(clientSocket, ZMQ_RCVTIMEO, &CLIENT_TIMEOUT,
                                                    sizeof(CLIENT_TIMEOUT));
@@ -168,7 +172,7 @@ constexpr crypto::Key TESTKEY {
 
 inline server::IMsgQueue::Messages createNewTestMessages(
     const std::vector<byte>& testData,
-    const std::size_t topicID) {
+    const std::uint32_t topicID) {
 
     auto *msg = createMsg(TESTKEY, testData);
     ++currentlyAllocatedMsgInstances;
@@ -184,7 +188,7 @@ TEST_F(Server, cryptsMessages) {
     const std::vector<byte> testData {
         0x04, 0x08, 0x15, 0x10, 0x17, 0x2a
     };
-    const std::size_t topicID = 108;
+    constexpr std::uint32_t topicID = 108;
     subscribeClient(server::Server::toLittleEndian(topicID));
 
     std::vector<server::IMsgQueue::Messages> vmsgs;
@@ -242,10 +246,12 @@ TEST_F(Server, cryptsMessages) {
         recvBytes.topicID,
         server::Server::toLittleEndian(topicID)
     ));
+    Log::debug("Topic ID was submitted successfully");
 
     // IV
     crypto::IV iv;
     ASSERT_EQ(recvBytes.iv.size(), iv.size());
+    Log::debug("IV was submitted successfully");
     std::copy_n(
         std::make_move_iterator(recvBytes.iv.begin()),
         iv.size(),
@@ -256,12 +262,13 @@ TEST_F(Server, cryptsMessages) {
     crypto::decrypt(&recvBytes.cipher[0], recvBytes.cipher.size(),
                     TESTKEY, iv);
     ASSERT_TRUE(equal(recvBytes.cipher, testData));
+    Log::debug("Cipher was submitted successfully");
 
     for (std::size_t i= 0; currentlyAllocatedMsgInstances.load() != 0; ++i) {
         if (i > 10) {
             break;
         }
-        std::this_thread::sleep_for(1s);
+        std::this_thread::sleep_for(10ms);
     }
     ASSERT_EQ(currentlyAllocatedMsgInstances.load(), 0);
 }
