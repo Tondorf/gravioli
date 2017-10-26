@@ -1,5 +1,6 @@
 #include <thread>
 
+#include "json/json.hpp"
 #include "SimpleLogger/logger.hpp"
 
 #include "playerProvider.hpp"
@@ -20,6 +21,75 @@ namespace simulation {
     }
 
 
+    std::vector<int> PlayerProvider::getPlayerIDs() {
+        int statusCode;
+        auto jsonString = _webclient.get("players", statusCode);
+
+        std::vector<int> playerIDs;
+        if (statusCode != 200) {
+            Log::error("WebClient returned status code: %d. "
+                       "This is an error!", statusCode);
+            return playerIDs;
+        }
+
+        using json = nlohmann::json;
+        auto j = json::parse(jsonString);
+
+        auto jsonIDs = j["IDs"];
+        if (jsonIDs.is_array()) {
+            playerIDs.reserve(jsonIDs.size());
+            for (auto id : jsonIDs) {
+                if (id.is_number()) {
+                    playerIDs.push_back(id.get<int>());
+                } else {
+                    Log::error("ID is not a number!");
+                }
+            }
+        } else {
+            Log::error("JSON element with id \"key\" is not an array!");
+        }
+
+        return playerIDs;
+    }
+
+
+    std::shared_ptr<Player> PlayerProvider::getPlayerById(int id) {
+        const auto url = std::string("player/") + std::to_string(id);
+
+        int statusCode;
+        auto jsonString = _webclient.get(url, statusCode);
+
+        if (statusCode != 200) {
+            Log::error("WebClient returned status code: %d. "
+                       "This is an error!", statusCode);
+            return nullptr;
+        }
+
+        using json = nlohmann::json;
+        auto j = json::parse(jsonString);
+
+        auto jsonKey = j["key"];
+        if (jsonKey.is_array() && jsonKey.size() == crypto::KEY_BLOCKSIZE) {
+            crypto::Key key;
+            for (std::size_t i = 0; i < crypto::KEY_BLOCKSIZE; ++i) {
+                auto b = jsonKey[i].get<int>();
+                if (b >= 0 && b <= 255) {
+                    key[i] = static_cast<byte>(b);
+                } else {
+                    Log::error("Digit of key is not of type byte");
+                    return nullptr;
+                }
+            }
+
+            return std::make_shared<Player>(id, key);
+        } else {
+            Log::error("JSON is malformed!");
+        }
+
+        return nullptr;
+    }
+
+
     void PlayerProvider::updatePlayers() {
         {
             std::unique_lock<std::mutex> lk(_mutex);
@@ -29,18 +99,12 @@ namespace simulation {
         }
 
         _updatedPlayers.clear();
-        _updatedPlayers.push_back(std::make_shared<Player>(0, crypto::Key {
-            0x00, 0x01, 0x02, 0x03,
-            0x04, 0x05, 0x06, 0x07,
-            0x08, 0x09, 0x0a, 0x0b,
-            0x0c, 0x0d, 0x0e, 0x0f
-        }));
-        _updatedPlayers.push_back(std::make_shared<Player>(1, crypto::Key {
-            0x01, 0x01, 0x02, 0x03,
-            0x04, 0x05, 0x06, 0x07,
-            0x08, 0x09, 0x0a, 0x0b,
-            0x0c, 0x0d, 0x0e, 0x0f
-        }));
+        for (auto playerID : getPlayerIDs()) {
+            auto&& player = getPlayerById(playerID);
+            if (player != nullptr) {
+                _updatedPlayers.push_back(player);
+            }
+        }
 
         _playerDataStatus = PlayerDataStatus::NEW_DATA_READY;
     }

@@ -6,6 +6,7 @@
 
 #include "player.hpp"
 #include "runnable.hpp"
+#include "webclient.hpp"
 
 
 namespace simulation {
@@ -17,8 +18,13 @@ namespace simulation {
 
         std::mutex _mutex;
 
+        utils::WebClient _webclient;
+
         std::vector<std::shared_ptr<Player>> _players;
         std::vector<std::shared_ptr<Player>> _updatedPlayers;
+
+        std::vector<int> getPlayerIDs();
+        std::shared_ptr<Player> getPlayerById(int id);
 
     public:
         PlayerProvider();
