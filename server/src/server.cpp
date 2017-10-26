@@ -124,6 +124,8 @@ namespace server {
             }
         }
 
+        sleep();
+
         return true;
     }
 
