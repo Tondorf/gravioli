@@ -6,7 +6,7 @@ namespace utils  {
     }
 
 
-    std::string get(const std::string& url, int& statusCode) {
+    std::string WebClient::get(const std::string& url, int& statusCode) {
         if (url == "players") {
             statusCode = 200;
             return "{ IDs: [0, 1] }";
