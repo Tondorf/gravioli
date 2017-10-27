@@ -25,7 +25,8 @@ namespace simulation {
 
         virtual std::vector<int> getPlayerIDs();
 
-        virtual std::shared_ptr<Player> getPlayerById(int id);
+        virtual std::shared_ptr<Player> getPlayerById(int id,
+                                                      bool expect200OK = true);
 
     public:
         PlayerProvider();

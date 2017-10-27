@@ -53,15 +53,20 @@ namespace simulation {
     }
 
 
-    std::shared_ptr<Player> PlayerProvider::getPlayerById(int id) {
+    std::shared_ptr<Player> PlayerProvider::getPlayerById(int id,
+                                                          bool expect200OK) {
         const auto url = std::string("player/") + std::to_string(id);
 
         int statusCode;
         auto jsonString = _webclient.get(url, statusCode);
 
-        if (statusCode != 200) {
+        if (expect200OK && statusCode != 200) {
             Log::error("WebClient returned status code: %d. "
                        "This is an error!", statusCode);
+            return nullptr;
+        }
+
+        if (jsonString.empty()) {
             return nullptr;
         }
 
