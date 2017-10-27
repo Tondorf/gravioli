@@ -11,7 +11,7 @@
 
 namespace simulation {
     class PlayerProvider: public utils::Runnable {
-    private:
+    protected:
         enum class PlayerDataStatus {
             AWAIT_NEW_DATA, NEW_DATA_READY
         } _playerDataStatus;
@@ -23,8 +23,9 @@ namespace simulation {
         std::vector<std::shared_ptr<Player>> _players;
         std::vector<std::shared_ptr<Player>> _updatedPlayers;
 
-        std::vector<int> getPlayerIDs();
-        std::shared_ptr<Player> getPlayerById(int id);
+        virtual std::vector<int> getPlayerIDs();
+
+        virtual std::shared_ptr<Player> getPlayerById(int id);
 
     public:
         PlayerProvider();
@@ -35,10 +36,10 @@ namespace simulation {
 
         PlayerProvider& operator=(const PlayerProvider&) = delete;
 
-        bool loop() override;
+        virtual bool loop() override;
 
-        void updatePlayers();
+        virtual void updatePlayers();
 
-        const std::vector<std::shared_ptr<Player>>& getPlayers();
+        virtual const std::vector<std::shared_ptr<Player>>& getPlayers();
     };
 }
