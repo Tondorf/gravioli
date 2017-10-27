@@ -18,7 +18,7 @@ using namespace std::chrono_literals;
 constexpr int CLIENT_TIMEOUT = 1000; // timeout in ms
 
 
-class TestServer : public server::Server {
+class TestServer: public server::Server {
 private:
     std::size_t _counter;
 
@@ -45,7 +45,7 @@ public:
     }
 };
 
-class Server : public ::testing::Test {
+class Server: public ::testing::Test {
 public:
     std::shared_ptr<server::SimpleMsgQueue> msgQueue;
     TestServer server;
