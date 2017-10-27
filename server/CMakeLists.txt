@@ -116,7 +116,8 @@ if (GTEST_FOUND)
                        test/test_userInputParser.cpp
                        test/test_crypto.cpp
                        test/test_simpleMsgQueue.cpp
-                       test/test_server.cpp)
+                       test/test_server.cpp
+                       test/test_playerProvider.cpp)
 
     configure_files(
         "${PROJECT_SOURCE_DIR}/test/KAT_AES"
