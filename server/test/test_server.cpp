@@ -195,7 +195,7 @@ TEST_F(Server, cryptsMessages) {
 
     ASSERT_EQ(currentlyAllocatedMsgInstances.load(), 0);
     for (std::size_t i = 0; i < NMSGS; ++i) {
-        vmsgs.push_back(std::move(createNewTestMessages(testData, topicID)));
+        vmsgs.push_back(createNewTestMessages(testData, topicID));
     }
     ASSERT_EQ(currentlyAllocatedMsgInstances.load(), NMSGS);
 
