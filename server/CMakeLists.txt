@@ -39,6 +39,17 @@ include_directories("include")
 # include *.hpp.in
 include_directories("${PROJECT_BINARY_DIR}")
 
+# include flatbuffers headers
+set(FLATBUFFERS_HEADERS "~/flatbuffers/include/flatbuffers" 
+    CACHE PATH "Location of flatbuffers headers")
+if (NOT EXISTS "${FLATBUFFERS_HEADERS}")
+    message(FATAL_ERROR "Given path to flatbuffers headers does not exist!")
+endif ()
+configure_files(
+    "${FLATBUFFERS_HEADERS}"
+    "${PROJECT_SOURCE_DIR}/lib/flatbuffers"
+)
+
 # include libraries
 include_directories("lib")
 
@@ -67,15 +78,24 @@ set_target_properties(
     CXX_STANDARD 14
     CXX_STANDARD_REQUIRED ON
 )
-if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE STREQUAL "debug")
-    set(CMAKE_CXX_FLAGS "\
-        -Wall -Wextra \
-        -Werror -pedantic \
-        -Wlogical-op \
-        -Wuseless-cast \
-        -Wdouble-promotion \
-        -Wformat=2\
-    ")
+if (CMAKE_BUILD_TYPE STREQUAL "debug")
+    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+        set(CMAKE_CXX_FLAGS "\
+            -Wall -Wextra \
+            -Werror \
+            -Wno-missing-braces \
+        ")
+    elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        set(CMAKE_CXX_FLAGS "\
+            -Wall -Wextra \
+            -Werror -pedantic \
+            -Wlogical-op \
+            -Wuseless-cast \
+            -Wdouble-promotion \
+            -Wformat=2\
+        ")
+    endif ()
 endif ()
 
 # add Boost library
