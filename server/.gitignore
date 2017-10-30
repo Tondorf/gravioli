@@ -1,2 +1,3 @@
 build/
 fbs/
+cmake-build-debug/
