@@ -16,7 +16,7 @@ public:
         argv.push_back("./server");
     }
 
-    void TearDown() {
+    void TearDown() override {
         argv.clear();
     }
 
