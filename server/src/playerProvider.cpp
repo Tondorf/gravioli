@@ -32,21 +32,25 @@ namespace simulation {
             return playerIDs;
         }
 
-        using json = nlohmann::json;
-        auto j = json::parse(jsonString);
+        try {
+            using json = nlohmann::json;
+            auto j = json::parse(jsonString);
 
-        auto jsonIDs = j["IDs"];
-        if (jsonIDs.is_array()) {
-            playerIDs.reserve(jsonIDs.size());
-            for (auto id : jsonIDs) {
-                if (id.is_number()) {
-                    playerIDs.push_back(id.get<int>());
-                } else {
-                    Log::error("ID is not a number!");
+            auto jsonIDs = j["IDs"];
+            if (jsonIDs.is_array()) {
+                playerIDs.reserve(jsonIDs.size());
+                for (auto id : jsonIDs) {
+                    if (id.is_number()) {
+                        playerIDs.push_back(id.get<int>());
+                    } else {
+                        Log::error("ID is not a number!");
+                    }
                 }
+            } else {
+                Log::error("JSON element with id \"key\" is not an array!");
             }
-        } else {
-            Log::error("JSON element with id \"key\" is not an array!");
+        } catch (const std::exception& e) {
+            Log::error("Error during JSON parsing: %s", e.what());
         }
 
         return playerIDs;
@@ -70,25 +74,29 @@ namespace simulation {
             return nullptr;
         }
 
-        using json = nlohmann::json;
-        auto j = json::parse(jsonString);
+        try {
+            using json = nlohmann::json;
+            auto j = json::parse(jsonString);
 
-        auto jsonKey = j["key"];
-        if (jsonKey.is_array() && jsonKey.size() == crypto::KEY_BLOCKSIZE) {
-            crypto::Key key;
-            for (std::size_t i = 0; i < crypto::KEY_BLOCKSIZE; ++i) {
-                auto b = jsonKey[i].get<int>();
-                if (b >= 0 && b <= 255) {
-                    key[i] = static_cast<byte>(b);
-                } else {
-                    Log::error("Digit of key is not of type byte");
-                    return nullptr;
+            auto jsonKey = j["key"];
+            if (jsonKey.is_array() && jsonKey.size() == crypto::KEY_BLOCKSIZE) {
+                crypto::Key key;
+                for (std::size_t i = 0; i < crypto::KEY_BLOCKSIZE; ++i) {
+                    auto b = jsonKey[i].get<int>();
+                    if (b >= 0 && b <= 255) {
+                        key[i] = static_cast<byte>(b);
+                    } else {
+                        Log::error("Digit of key is not of type byte");
+                        return nullptr;
+                    }
                 }
-            }
 
-            return std::make_shared<Player>(id, key);
-        } else {
-            Log::error("JSON is malformed!");
+                return std::make_shared<Player>(id, key);
+            } else {
+                Log::error("JSON is malformed!");
+            }
+        } catch (const std::exception& e) {
+            Log::error("Error during JSON parsing: %s", e.what());
         }
 
         return nullptr;
