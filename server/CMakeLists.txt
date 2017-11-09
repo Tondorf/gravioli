@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5.1)
+cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
 
 #set(CMAKE_BUILD_TYPE release)
 set(CMAKE_BUILD_TYPE debug)
@@ -86,6 +86,19 @@ if (CMAKE_BUILD_TYPE STREQUAL "debug")
             -Werror \
             -Wno-missing-braces \
         ")
+
+        # add IWYU to build chain
+        set(IWYU_ROOT_PATH "/usr/lib/clang/"
+            CACHE PATH "Root location of IWYU executable")
+        find_program(iwyu_path NAMES include-what-you-use iwyu
+                     PATHS ${IWYU_ROOT_PATH})
+        if (NOT iwyu_path)
+            message(WARNING "Could not find the program include-what-you-use")
+        else ()
+            message(STATUS "Found IWYU: " ${iwyu_path})
+            set_property(TARGET ${EXECUTABLE_NAME} PROPERTY CXX_INCLUDE_WHAT_YOU_USE ${iwyu_path})
+        endif ()
+
     elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         set(CMAKE_CXX_FLAGS "\
             -Wall -Wextra \
