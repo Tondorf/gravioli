@@ -72,10 +72,10 @@ set(SOURCE_FILES src/userInputParser.cpp
                  src/webclient.cpp)
 add_executable(${EXECUTABLE_NAME} src/main.cxx ${SOURCE_FILES})
 
-# require C++14
+# require C++17
 set_target_properties(
     ${EXECUTABLE_NAME} PROPERTIES
-    CXX_STANDARD 14
+    CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
 )
 if (CMAKE_BUILD_TYPE STREQUAL "debug")
