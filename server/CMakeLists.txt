@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
+project(server)
 
 #set(CMAKE_BUILD_TYPE release)
 set(CMAKE_BUILD_TYPE debug)
 
-project(server)
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 1)
 
