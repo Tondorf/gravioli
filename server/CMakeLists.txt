@@ -177,5 +177,10 @@ if (GTEST_FOUND)
     target_link_libraries(${EXECUTABLE_NAME_TEST} ${CMAKE_THREAD_LIBS_INIT})
     target_link_libraries(${EXECUTABLE_NAME_TEST} ${ZMQ_LIB})
     target_link_libraries(${EXECUTABLE_NAME_TEST} ${CRYPTOPP_LIB})
+
+    if (iwyu_path)
+        set_property(TARGET ${EXECUTABLE_NAME_TEST} PROPERTY CXX_INCLUDE_WHAT_YOU_USE ${iwyu_path})
+    endif ()
+
 endif ()
 

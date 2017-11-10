@@ -1,9 +1,9 @@
 #pragma once
 
+#include "config.hpp"
+#include "crypto.hpp"
 #include "message.hpp"
-#include "server.hpp"
-
-#include "flatbuffers/flatbuffers.h"
+namespace flatbuffers { class FlatBufferBuilder; }
 
 
 namespace server {

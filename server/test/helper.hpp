@@ -1,8 +1,11 @@
 #pragma once
 
 #include <atomic>
-
-#include "byteMessage.hpp"
+#include <cstddef>
+#include <vector>
+#include "config.hpp"
+#include "crypto.hpp"
+class ByteMessage;
 
 
 extern std::atomic<std::size_t> currentlyAllocatedMsgInstances;

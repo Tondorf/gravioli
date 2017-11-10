@@ -1,8 +1,15 @@
 #include <gtest/gtest.h>
-
-#include "simpleMsgQueue.hpp"
-
+#include <array>
+#include <cstddef>
+#include <type_traits>
+#include <utility>
+#include <vector>
+#include "byteMessage.hpp"
+#include "config.hpp"
+#include "crypto.hpp"
 #include "helper.hpp"
+#include "server.hpp"
+#include "simpleMsgQueue.hpp"
 
 
 inline ::testing::AssertionResult equalAndNotNull(server::IMessage *a,

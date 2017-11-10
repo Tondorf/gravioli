@@ -1,8 +1,13 @@
 #pragma once
 
 #include <atomic>
-
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <vector>
 #include "world.hpp"
+namespace server { class IMsgQueue; }
+namespace simulation { class PlayerProvider; }
 
 
 namespace simulation {

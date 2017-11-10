@@ -1,13 +1,13 @@
 #pragma once
 
+#include <array>
+#include <cstdint>
 #include <memory>
 #include <random>
-
-#include "player.hpp"
-#include "server.hpp"
-#include "playerProvider.hpp"
-
-#include "flatbuffers/flatbuffers.h"
+#include <vector>
+namespace flatbuffers { class FlatBufferBuilder; }
+namespace simulation { class Player; }
+namespace simulation { class PlayerProvider; }
 
 
 namespace simulation {

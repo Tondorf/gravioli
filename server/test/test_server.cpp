@@ -1,15 +1,26 @@
 #include <gtest/gtest.h>
-
+#include <stdint.h>
+#include <zmq.h>
 #include <algorithm>
+#include <array>
+#include <atomic>
+#include <chrono>
+#include <cstddef>
 #include <cstring>
 #include <future>
+#include <iterator>
+#include <memory>
 #include <thread>
-
+#include <type_traits>
+#include <utility>
+#include <vector>
 #include "SimpleLogger/logger.hpp"
-
-#include "simpleMsgQueue.hpp"
-
+#include "byteMessage.hpp"
+#include "config.hpp"
+#include "crypto.hpp"
 #include "helper.hpp"
+#include "server.hpp"
+#include "simpleMsgQueue.hpp"
 
 
 using namespace std::chrono_literals;

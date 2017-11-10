@@ -1,10 +1,9 @@
-#include <iostream>
-
+#include <cassert>
 #include <boost/program_options.hpp>
-
-#include "userInputParser.hpp"
-
+#include <iostream>
+#include <string>
 #include "SimpleLogger/logger.hpp"
+#include "userInputParser.hpp"
 
 
 bool parseUserInput(int argc, char const* argv[], Config& config) {

@@ -1,10 +1,12 @@
 #pragma once
 
-#include <memory>
-#include <vector>
-
 #include <zmq.h>
-
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <utility>
+#include <vector>
+#include "config.hpp"
 #include "crypto.hpp"
 #include "runnable.hpp"
 

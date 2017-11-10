@@ -1,4 +1,7 @@
 #include "fbmessage.hpp"
+#include <functional>
+#include "flatbuffers/flatbuffers.h"
+
 
 namespace server {
     FBMessage::FBMessage(const crypto::Key& key,

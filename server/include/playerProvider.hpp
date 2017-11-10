@@ -3,10 +3,9 @@
 #include <memory>
 #include <mutex>
 #include <vector>
-
-#include "player.hpp"
 #include "runnable.hpp"
 #include "webclient.hpp"
+namespace simulation { class Player; }
 
 
 namespace simulation {

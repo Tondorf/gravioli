@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
-
+#include <vector>
+#include "config.hpp"
 #include "userInputParser.hpp"
 
 

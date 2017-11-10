@@ -1,6 +1,5 @@
 #include "simpleMsgQueue.hpp"
-
-#include "config.hpp"
+#include <algorithm>
 
 
 namespace server {
