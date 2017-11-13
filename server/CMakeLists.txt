@@ -166,10 +166,10 @@ if (GTEST_FOUND)
     target_link_libraries(${EXECUTABLE_NAME_TEST} gtest)
     add_test(NAME ${EXECUTABLE_NAME_TEST} COMMAND ${EXECUTABLE_NAME_TEST})
 
-    # require C++14
+    # require C++17
     set_target_properties(
         ${EXECUTABLE_NAME_TEST} PROPERTIES
-        CXX_STANDARD 14
+        CXX_STANDARD 17
         CXX_STANDARD_REQUIRED ON
     )
 
