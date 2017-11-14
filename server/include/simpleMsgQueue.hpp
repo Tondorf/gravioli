@@ -16,8 +16,8 @@ namespace server {
 
         virtual ~SimpleMsgQueue() = default;
 
-        void push(Messages&&);
+        virtual void push(Messages&&) override;
 
-        bool pop(Messages&);
+        virtual bool pop(Messages&) override;
     };
 }
