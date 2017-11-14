@@ -40,8 +40,7 @@ namespace simulation {
             using json = nlohmann::json;
             auto j = json::parse(jsonString);
 
-            auto jsonIDs = j["IDs"];
-            if (jsonIDs.is_array()) {
+            if (auto jsonIDs = j["IDs"]; jsonIDs.is_array()) {
                 playerIDs.reserve(jsonIDs.size());
                 for (auto id : jsonIDs) {
                     if (id.is_number()) {
@@ -82,8 +81,8 @@ namespace simulation {
             using json = nlohmann::json;
             auto j = json::parse(jsonString);
 
-            auto jsonKey = j["key"];
-            if (jsonKey.is_array() && jsonKey.size() == crypto::KEY_BLOCKSIZE) {
+            if (auto jsonKey = j["key"];
+                jsonKey.is_array() && jsonKey.size() == crypto::KEY_BLOCKSIZE) {
                 crypto::Key key;
                 for (std::size_t i = 0; i < crypto::KEY_BLOCKSIZE; ++i) {
                     auto b = jsonKey[i].get<int>();
@@ -94,7 +93,6 @@ namespace simulation {
                         return nullptr;
                     }
                 }
-
                 return std::make_shared<Player>(id, key);
             } else {
                 Log::error("JSON is malformed!");
