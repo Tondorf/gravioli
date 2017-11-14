@@ -21,7 +21,7 @@ namespace simulation {
 
         static std::atomic<std::size_t> currentlyAllocatedMsgInstances;
 
-        void loop(std::uint64_t) override;
+        virtual void loop(std::uint64_t) override;
 
         void sendWorldToMsgQueue();
 
