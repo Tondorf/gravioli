@@ -3,6 +3,7 @@
 #include <chrono>
 #include <cmath>
 #include <string>
+#include "tools.hpp"
 
 
 constexpr unsigned int VERSION_MAJOR = @VERSION_MAJOR@;
@@ -11,9 +12,11 @@ constexpr unsigned int VERSION_MINOR = @VERSION_MINOR@;
 enum class BuildType {
     DEBUG, RELEASE
 };
-constexpr char BUILD_TYPE_AS_STRING[] = "@CMAKE_BUILD_TYPE@";
-const BuildType BUILD_TYPE = []() {
-    if (std::string("@CMAKE_BUILD_TYPE@").compare("release") == 0) {
+constexpr const char *BUILD_TYPE_AS_STRING = "@CMAKE_BUILD_TYPE@";
+constexpr BuildType BUILD_TYPE = []() {
+    constexpr const char *buildType = BUILD_TYPE_AS_STRING;
+    constexpr bool isRelease = equal(buildType, "release");
+    if constexpr (isRelease) {
         return BuildType::RELEASE;
     }
     return BuildType::DEBUG;
@@ -22,8 +25,8 @@ const BuildType BUILD_TYPE = []() {
 using port_t = std::uint16_t;
 constexpr port_t DEFAULT_PORT = 8888;
 
-constexpr char LOGDATE_LOCALE[] = "en_US.UTF8";
-constexpr char LOGDATE_FORMAT[] = "%d/%b/%Y:%H:%M:%S %z";
+constexpr const char *LOGDATE_LOCALE = "en_US.UTF8";
+constexpr const char *LOGDATE_FORMAT = "%d/%b/%Y:%H:%M:%S %z";
 
 enum class CryptoLevel {
     FAST, HIGH, ACADEMIC
