@@ -11,21 +11,9 @@ We provide all requirements for the python client within the `requirements.txt` 
 This file was obtained via `pip freeze`, thus one can use `pip install -r requirements.txt` in order to install the requirements.
 We highly encourage you to use [virtualenv](https://virtualenv.pypa.io).
 
-# Installation of the server
-Note: You first have to compile and install the `flatbuffers` obejects!
+# Start of the server
+We provide a Dockerfile.
 ```
-> cd server/
-> mkdir build && cd build/
-> cmake -DFLATBUFFERS_HEADERS=<path to flatbuffers headers> ..
-> make && ./runAllUnitTests
-```
-where you have to replace `<path to flatbuffers/include/flatbuffers>` with the proper path to the `flatbuffers` header files, e.g.:
-```
-> cd ~/flatbuffers/include/flatbuffers/ && ls -1
-base.h
-code_generators.h
-flatbuffers.h
-flatc.h
-flexbuffers.
-...
+> docker build -t gravioli-server .
+> docker run --rm -p 8888:8888 gravioli-server
 ```
