@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
 project(server)
 
-#set(CMAKE_BUILD_TYPE release)
-set(CMAKE_BUILD_TYPE debug)
+#set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 1)
@@ -78,7 +78,7 @@ set_target_properties(
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
 )
-if (CMAKE_BUILD_TYPE STREQUAL "debug")
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
         set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
         set(CMAKE_CXX_FLAGS "\

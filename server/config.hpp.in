@@ -15,7 +15,7 @@ enum class BuildType {
 constexpr const char *BUILD_TYPE_AS_STRING = "@CMAKE_BUILD_TYPE@";
 constexpr BuildType BUILD_TYPE = []() {
     constexpr const char *buildType = BUILD_TYPE_AS_STRING;
-    constexpr bool isRelease = equal(buildType, "release");
+    constexpr bool isRelease = equal(buildType, "Release");
     if constexpr (isRelease) {
         return BuildType::RELEASE;
     }
