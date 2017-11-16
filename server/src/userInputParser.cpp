@@ -2,7 +2,6 @@
 #include <boost/program_options.hpp>
 #include <iostream>
 #include <string>
-#include "SimpleLogger/logger.hpp"
 #include "userInputParser.hpp"
 
 
@@ -21,9 +20,9 @@ bool parseUserInput(int argc, char const* argv[], Config& config) {
     try {
         po::store(po::parse_command_line(argc, argv, desc), vm);
         po::notify(vm);
-    } catch(po::error& e) {
+    } catch(po::error&) {
         parsingSuccessfully = false;
-        Log::error("Couldn't parse user input; %s", e.what());
+        std::cerr << "Error: Couldn't parse inputs!\n" << std::endl;
     }
     
     if (!parsingSuccessfully || vm.count("help")) {
