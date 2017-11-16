@@ -3,6 +3,7 @@
 #include <csignal>
 #include <cstdlib>
 #include <ctime>
+#include <fstream>
 #include <functional>
 #include <future>
 #include <iomanip>
@@ -20,6 +21,7 @@
 
 
 void configureLogger();
+void printSplash();
 void awaitShutdown(boost::asio::signal_set &,
                    std::function<void(boost::system::error_code, int)>);
 
@@ -29,6 +31,7 @@ int main(int argc, char const* argv[]) {
     if (!parseUserInput(argc, argv, config)) {
         return EXIT_FAILURE;
     }
+    printSplash();
 
     configureLogger();
 
@@ -119,6 +122,22 @@ void configureLogger() {
         auto logLevel = Log::SimpleLogger::getInstance().getLogLevel();
         return Log::SimpleLogger::logLevelAsString(logLevel);
     }().c_str());
+}
+
+
+void printSplash() {
+    std::string line;
+    std::ifstream splashFile;
+	splashFile.open(SPLASH_FILE);
+    while (!splashFile.eof()) {
+        getline(splashFile, line);
+        std::cout << line << '\n';
+    }
+	splashFile.close();
+    std::cout << "Version: ";
+    std::cout << VERSION_MAJOR << "." << VERSION_MINOR;
+    std::cout << " (" << BUILD_TYPE_AS_STRING << ")";
+    std::cout << '\n' << std::endl;
 }
 
 

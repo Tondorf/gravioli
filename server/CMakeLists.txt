@@ -16,6 +16,12 @@ configure_file(
     "${PROJECT_BINARY_DIR}/config.hpp"
 )
 
+configure_file(
+    "${PROJECT_SOURCE_DIR}/splash.txt"
+    "${PROJECT_BINARY_DIR}/splash.txt"
+    COPYONLY
+)
+
 # Copy files from source directory to destination directory and
 # creates destination directory if it does not exist.
 macro(configure_files srcDir destDir)

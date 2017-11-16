@@ -22,6 +22,8 @@ constexpr BuildType BUILD_TYPE = []() {
     return BuildType::DEBUG;
 }();
 
+constexpr const char *SPLASH_FILE = "splash.txt";
+
 using port_t = std::uint16_t;
 constexpr port_t DEFAULT_PORT = 8888;
 
