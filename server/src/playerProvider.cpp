@@ -109,6 +109,19 @@ namespace simulation {
         {
             std::unique_lock<std::mutex> lk(_mutex);
             if (_playerDataStatus != PlayerDataStatus::AWAIT_NEW_DATA) {
+                /*
+                 *     x != PlayerDataStatus::AWAIT_NEW_DATA
+                 * <=> x == PlayerDataStatus::NEW_DATA_READY
+                 *
+                 * There are already new data available that wait
+                 * to get pulled via PlayerProvider::getPlayers().
+                 * Returning at this point is not an error, though this 
+                 * might indicate an unnecessary call to this method.
+                 *
+                 * This is some messed up variation of caching, thus returning
+                 * 'false' (or even 'true') is misleading since there
+                 * actually was a successful update.  
+                 */
                 return;
             }
         }
