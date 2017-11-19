@@ -127,7 +127,7 @@ namespace simulation {
         }
 
         _updatedPlayers.clear();
-        for (auto playerID : getPlayerIDs()) {
+        for (const auto& playerID : getPlayerIDs()) {
             auto&& player = getPlayerById(playerID);
             if (player != nullptr) {
                 _updatedPlayers.push_back(player);
