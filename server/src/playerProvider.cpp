@@ -105,6 +105,18 @@ namespace simulation {
     }
 
 
+    /*
+     * !!! WARNING !!!
+     *
+     * Make sure to read ALL (!) comments below and be 100% sure, that you
+     * understand the current logic of this method and its dependency with
+     *
+     * PlayerProvider::getPlayers()
+     *
+     * before doing any changes! There are assumptions that are not forced
+     * by design, i.e. your changes might compile but this does not guarantee
+     * thread-safety!
+     */
     void PlayerProvider::updatePlayers() {
         {
             std::unique_lock<std::mutex> lk(_mutex);
@@ -125,6 +137,16 @@ namespace simulation {
                 return;
             }
         }
+        
+        /*
+         * Reaching this point guarantees:
+         *
+         * _playerDataStatus == PlayerDataStatus::AWAIT_NEW_DATA
+         *
+         * Thus, _updatedPlayers will never get touched as long as
+         * _playerDataStatus is not set to PlayerDataStatus::NEW_DATA_READY
+         * and this is done in this method only!
+         */
 
         _updatedPlayers.clear();
         for (const auto& playerID : getPlayerIDs()) {
@@ -134,6 +156,9 @@ namespace simulation {
             }
         }
 
+        /*
+         * This unleashes PlayerProvider::getPlayers()...
+         */
         _playerDataStatus = PlayerDataStatus::NEW_DATA_READY;
     }
 
