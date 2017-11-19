@@ -59,7 +59,7 @@ public:
         return simulation::PlayerProvider::getPlayerById(id, expect200OK);
     }
 
-    PlayerDataStatus getPlayerDataStatus() {
+    BinaryPlayerDataStatus getPlayerDataStatus() {
         return _playerDataStatus;
     }
 };

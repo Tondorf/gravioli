@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <memory>
 #include <mutex>
 #include <vector>
@@ -11,9 +12,10 @@ namespace simulation { class Player; }
 namespace simulation {
     class PlayerProvider: public utils::Runnable {
     protected:
-        enum class PlayerDataStatus {
+        enum class BinaryPlayerDataStatus {
             AWAIT_NEW_DATA, NEW_DATA_READY
-        } _playerDataStatus;
+        };
+        std::atomic<BinaryPlayerDataStatus> _playerDataStatus;
 
         std::mutex _mutex;
 

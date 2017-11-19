@@ -12,7 +12,7 @@
 
 namespace simulation {
     PlayerProvider::PlayerProvider():
-        _playerDataStatus(PlayerDataStatus::AWAIT_NEW_DATA) {
+        _playerDataStatus(BinaryPlayerDataStatus::AWAIT_NEW_DATA) {
     }
 
 
@@ -108,7 +108,7 @@ namespace simulation {
     /*
      * !!! WARNING !!!
      *
-     * Make sure to read ALL (!) comments below and be 100% sure, that you
+     * Make sure to read ALL (!) comments below and to be 100% sure, that you
      * understand the current logic of this method and its dependency with
      *
      * PlayerProvider::getPlayers()
@@ -118,33 +118,33 @@ namespace simulation {
      * thread-safety!
      */
     void PlayerProvider::updatePlayers() {
-        {
-            std::unique_lock<std::mutex> lk(_mutex);
-            if (_playerDataStatus != PlayerDataStatus::AWAIT_NEW_DATA) {
-                /*
-                 *     x != PlayerDataStatus::AWAIT_NEW_DATA
-                 * <=> x == PlayerDataStatus::NEW_DATA_READY
-                 *
-                 * There are already new data available that wait
-                 * to get pulled via PlayerProvider::getPlayers().
-                 * Returning at this point is not an error, though this 
-                 * might indicate an unnecessary call to this method.
-                 *
-                 * This is some messed up variation of caching, thus returning
-                 * 'false' (or even 'true') is misleading since there
-                 * actually was a successful update.  
-                 */
-                return;
-            }
+        if (_playerDataStatus != BinaryPlayerDataStatus::AWAIT_NEW_DATA) {
+            /*
+             *     x != BinaryPlayerDataStatus::AWAIT_NEW_DATA
+             * <=> x == BinaryPlayerDataStatus::NEW_DATA_READY
+             *
+             * There are already new data available that wait
+             * to get pulled via PlayerProvider::getPlayers().
+             * Returning at this point is not an error, though this 
+             * might indicate an unnecessary call to this method.
+             *
+             * This is some messed up variation of caching, thus returning
+             * 'false' (or even 'true') is misleading since there
+             * actually was a successful update.  
+             */
+            return;
         }
         
         /*
          * Reaching this point guarantees:
          *
-         * _playerDataStatus == PlayerDataStatus::AWAIT_NEW_DATA
+         * _playerDataStatus == BinaryPlayerDataStatus::AWAIT_NEW_DATA
          *
          * Thus, _updatedPlayers will never get touched as long as
-         * _playerDataStatus is not set to PlayerDataStatus::NEW_DATA_READY
+         * _playerDataStatus is not set to
+         *
+         * BinaryPlayerDataStatus::NEW_DATA_READY
+         *
          * and this is done in this method only!
          */
 
@@ -159,17 +159,17 @@ namespace simulation {
         /*
          * This unleashes PlayerProvider::getPlayers()...
          */
-        _playerDataStatus = PlayerDataStatus::NEW_DATA_READY;
+        _playerDataStatus = BinaryPlayerDataStatus::NEW_DATA_READY;
     }
 
 
     const std::vector<std::shared_ptr<Player>>& PlayerProvider::getPlayers() {
         {
             std::unique_lock<std::mutex> lk(_mutex);
-            if (_playerDataStatus == PlayerDataStatus::NEW_DATA_READY) {
+            if (_playerDataStatus == BinaryPlayerDataStatus::NEW_DATA_READY) {
                 std::swap(_players, _updatedPlayers);
 
-                _playerDataStatus = PlayerDataStatus::AWAIT_NEW_DATA;
+                _playerDataStatus = BinaryPlayerDataStatus::AWAIT_NEW_DATA;
             }
         }
         
