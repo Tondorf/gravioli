@@ -19,7 +19,7 @@ namespace simulation {
     bool PlayerProvider::loop() {
         updatePlayers();
 
-        std::this_thread::sleep_for(USER_SYNC_SLEEP);
+        std::this_thread::sleep_for(USER_SYNC_INTERVAL);
 
         return true;
     }

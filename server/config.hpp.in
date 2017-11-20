@@ -42,6 +42,6 @@ constexpr std::chrono::milliseconds SERVER_SLEEP(10);
 constexpr std::chrono::milliseconds WORLD_SLEEP(1000);
 constexpr std::size_t MAX_ALLOCATED_MSG_INSTANCES = 10;
 
-constexpr std::chrono::milliseconds USER_SYNC_SLEEP(1000);
+constexpr std::chrono::milliseconds USER_SYNC_INTERVAL(1000);
 
 constexpr double pi = 3.14159265359;
