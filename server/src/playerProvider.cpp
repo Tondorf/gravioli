@@ -26,19 +26,18 @@ namespace simulation {
 
 
     std::vector<int> PlayerProvider::getPlayerIDs() {
-        int statusCode;
-        auto jsonString = _webclient.get("players", statusCode);
+        const auto res = _webclient.get("players");
 
         std::vector<int> playerIDs;
-        if (statusCode != 200) {
+        if (res.statusCode != 200) {
             Log::error("WebClient returned status code: %d. "
-                       "This is an error!", statusCode);
+                       "This is an error!", res.statusCode);
             return playerIDs;
         }
 
         try {
             using json = nlohmann::json;
-            auto j = json::parse(jsonString);
+            auto j = json::parse(res.content);
 
             if (auto jsonIDs = j["IDs"]; jsonIDs.is_array()) {
                 playerIDs.reserve(jsonIDs.size());
@@ -63,23 +62,21 @@ namespace simulation {
     std::shared_ptr<Player> PlayerProvider::getPlayerById(int id,
                                                           bool expect200OK) {
         const auto url = std::string("player/") + std::to_string(id);
+        const auto res = _webclient.get(url);
 
-        int statusCode;
-        auto jsonString = _webclient.get(url, statusCode);
-
-        if (expect200OK && statusCode != 200) {
+        if (expect200OK && res.statusCode != 200) {
             Log::error("WebClient returned status code: %d. "
-                       "This is an error!", statusCode);
+                       "This is an error!", res.statusCode);
             return nullptr;
         }
 
-        if (jsonString.empty()) {
+        if (res.content.empty()) {
             return nullptr;
         }
 
         try {
             using json = nlohmann::json;
-            auto j = json::parse(jsonString);
+            auto j = json::parse(res.content);
 
             if (auto jsonKey = j["key"];
                 jsonKey.is_array() && jsonKey.size() == crypto::KEY_BLOCKSIZE) {

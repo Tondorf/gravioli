@@ -10,6 +10,10 @@ namespace utils {
 
         virtual ~WebClient() = default;
 
-        virtual std::string get(const std::string& url, int& statusCode);
+        struct Response {
+            std::string content;
+            int statusCode;
+        };
+        virtual Response get(const std::string& url);
     };
 }
