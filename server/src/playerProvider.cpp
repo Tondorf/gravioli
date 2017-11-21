@@ -59,19 +59,14 @@ namespace simulation {
     }
 
 
-    std::shared_ptr<Player> PlayerProvider::getPlayerById(int id,
-                                                          bool expect200OK) {
+    stdx::optional<std::shared_ptr<Player>> PlayerProvider::getPlayerById(
+        int id) {
+
         const auto url = std::string("player/") + std::to_string(id);
         const auto res = _webclient.get(url);
 
-        if (expect200OK && res.statusCode != 200) {
-            Log::error("WebClient returned status code: %d. "
-                       "This is an error!", res.statusCode);
-            return nullptr;
-        }
-
-        if (res.content.empty()) {
-            return nullptr;
+        if (res.statusCode != 200 || res.content.empty()) {
+            return stdx::nullopt;
         }
 
         try {
@@ -87,7 +82,7 @@ namespace simulation {
                         key[i] = static_cast<byte>(b);
                     } else {
                         Log::error("Digit of key is not of type byte");
-                        return nullptr;
+                        return stdx::nullopt;
                     }
                 }
                 return std::make_shared<Player>(id, key);
@@ -98,7 +93,7 @@ namespace simulation {
             Log::error("Error during JSON parsing: %s", e.what());
         }
 
-        return nullptr;
+        return stdx::nullopt;
     }
 
 
@@ -148,8 +143,10 @@ namespace simulation {
         _updatedPlayers.clear();
         for (const auto& playerID : getPlayerIDs()) {
             auto&& player = getPlayerById(playerID);
-            if (player != nullptr) {
-                _updatedPlayers.push_back(player);
+            if (player) {
+                _updatedPlayers.push_back(player.value());
+            } else {
+                Log::error("Could not find Player by ID = %d", playerID);
             }
         }
 

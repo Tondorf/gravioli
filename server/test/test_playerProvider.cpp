@@ -50,9 +50,8 @@ public:
         return simulation::PlayerProvider::getPlayerIDs();
     }
 
-    std::shared_ptr<simulation::Player> getPlayerById(int id,
-                                                      bool expect200OK = true) {
-        return simulation::PlayerProvider::getPlayerById(id, expect200OK);
+    stdx::optional<std::shared_ptr<simulation::Player>> getPlayerById(int id) {
+        return simulation::PlayerProvider::getPlayerById(id);
     }
 
     BinaryPlayerDataStatus getPlayerDataStatus() {
@@ -105,8 +104,8 @@ inline ::testing::AssertionResult equal(const simulation::Player& a,
 
 
 TEST_F(PlayerProvider, returnNullptrForNonExistingPlayer) {
-    auto player = playerProvider.getPlayerById(2, false);
-    ASSERT_EQ(player, nullptr);
+    auto player = playerProvider.getPlayerById(2);
+    ASSERT_FALSE(player ? true : false);
 }
 
 
@@ -114,16 +113,18 @@ TEST_F(PlayerProvider, readsPlayerFromJSON) {
     auto player1 = playerProvider.getPlayerById(0);
     auto player2 = playerProvider.getPlayerById(1);
 
-    ASSERT_FALSE(equal(*player1, *player2));
+    ASSERT_TRUE(player1 ? true : false);
+    ASSERT_TRUE(player2 ? true : false);
+    ASSERT_FALSE(equal(*(player1.value()), *(player2.value())));
 
-    ASSERT_TRUE(equal(*player1, simulation::Player(0, crypto::Key {
+    ASSERT_TRUE(equal(*(player1.value()), simulation::Player(0, crypto::Key {
         0x00, 0x01, 0x02, 0x03,
         0x04, 0x05, 0x06, 0x07,
         0x08, 0x09, 0x0a, 0x0b,
         0x0c, 0x0d, 0x0e, 0x0f
     })));
 
-    ASSERT_TRUE(equal(*player2, simulation::Player(1, crypto::Key {
+    ASSERT_TRUE(equal(*(player2.value()), simulation::Player(1, crypto::Key {
         0x01, 0x01, 0x02, 0x03,
         0x04, 0x05, 0x06, 0x07,
         0x08, 0x09, 0x0a, 0x0b,

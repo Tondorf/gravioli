@@ -5,6 +5,7 @@
 #include <mutex>
 #include <vector>
 #include "runnable.hpp"
+#include "optional.hpp"
 #include "webclient.hpp"
 namespace simulation { class Player; }
 
@@ -26,8 +27,7 @@ namespace simulation {
 
         virtual std::vector<int> getPlayerIDs();
 
-        virtual std::shared_ptr<Player> getPlayerById(int id,
-                                                      bool expect200OK = true);
+        virtual stdx::optional<std::shared_ptr<Player>> getPlayerById(int id);
 
     public:
         PlayerProvider();
