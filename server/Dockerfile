@@ -35,14 +35,6 @@ USER root
 RUN cd /home/user/cmake && make install && apt-get -yqq purge cmake
 USER user
 
-# install flatbuffers
-RUN cd ~ && git clone https://github.com/google/flatbuffers.git && \
-cd flatbuffers && \
-cmake -G "Unix Makefiles" && make -j4
-USER root
-RUN cd /home/user/flatbuffers && make install
-USER user
-
 # install zeromq
 RUN cd ~ && git clone https://github.com/zeromq/libzmq && \
 cd libzmq && mkdir build && cd build && \
@@ -51,10 +43,15 @@ USER root
 RUN cd /home/user/libzmq/build && make install && ldconfig
 USER user
 
+# install flatbuffers
+RUN cd ~ && git clone https://github.com/google/flatbuffers.git && \
+cd flatbuffers && \
+cmake -G "Unix Makefiles" && make -j4
+ENV PATH="/home/user/flatbuffers:${PATH}"
+
 # install gravioli server
 RUN cd ~ && git clone https://github.com/Tondorf/gravioli.git && \
 cd gravioli && \
-git checkout -b td17v2_preparation && git pull origin td17v2_preparation && \
 cd fbs && make && make install && \
 cd ~/ && mkdir gravioli-server && cd gravioli-server && \
 cmake -DCMAKE_BUILD_TYPE=Release -DFLATBUFFERS_HEADERS=~/flatbuffers/include/flatbuffers \
