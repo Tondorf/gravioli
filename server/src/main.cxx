@@ -14,6 +14,7 @@
 #include <vector>
 #include "SimpleLogger/logger.hpp"
 #include "config.hpp"
+#include "gravioliWorld.hpp"
 #include "serializableWorld.hpp"
 #include "server.hpp"
 #include "simpleMsgQueue.hpp"
@@ -41,7 +42,7 @@ int main(int argc, char const* argv[]) {
     auto msgQueue = std::make_shared<server::SimpleMsgQueue>();
     server::Server server(config.port, msgQueue);
 
-    std::vector<std::shared_ptr<simulation::SerializableWorld>> worlds;
+    std::vector<std::shared_ptr<simulation::GravioliWorld>> worlds;
     simulation::SerializableWorld::init(worlds, msgQueue);
 
     boost::asio::io_service ios;

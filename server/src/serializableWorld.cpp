@@ -1,5 +1,6 @@
 #include "serializableWorld.hpp"
 #include <chrono>
+#include <memory>
 #include <thread>
 #include <type_traits>
 #include <utility>
@@ -51,23 +52,6 @@ namespace simulation {
         } else {
             Log::info("World #%d: All allocated messages are deleted.", ID);
         }
-    }
-
-
-    void SerializableWorld::init(std::vector<SerializableWorld_ptr>& worlds,
-                                 MsgQueue_ptr msgQueue) {
-        auto newWorld = [&msgQueue](int id) {
-            auto&& playerProvider = std::make_shared<PlayerProvider>();
-            return std::make_shared<SerializableWorld>(id, playerProvider, 
-                                                       msgQueue);
-        };
-        worlds.push_back(newWorld(0));
-    }
-
-
-    void SerializableWorld::loop(std::uint64_t t) {
-        World::loop(t);
-        sendWorldToMsgQueue();
     }
 
 

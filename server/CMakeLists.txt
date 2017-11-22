@@ -77,7 +77,8 @@ set(SOURCE_FILES src/userInputParser.cpp
                  src/serializableWorld.cpp
                  src/fbmessage.cpp
                  src/player.cpp
-                 src/webclient.cpp)
+                 src/webclient.cpp
+                 src/gravioliWorld.cpp)
 add_executable(${EXECUTABLE_NAME} src/main.cxx ${SOURCE_FILES})
 
 # require C++17
