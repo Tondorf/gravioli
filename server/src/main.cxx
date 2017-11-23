@@ -46,7 +46,7 @@ int main(int argc, char const* argv[]) {
     auto webClient = std::make_shared<gravioli::GravioliWebClient>();
 
     std::vector<std::shared_ptr<gravioli::GravioliWorld>> worlds;
-    simulation::SerializableWorld::init(worlds, msgQueue, webClient);
+    server::SerializableWorld::init(worlds, msgQueue, webClient);
 
     boost::asio::io_service ios;
     boost::asio::signal_set shutdownSignal(ios);

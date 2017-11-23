@@ -1,16 +1,11 @@
 #pragma once
 
-#include <array>
 #include <cstdint>
 #include <memory>
-#include <random>
-#include <vector>
-namespace flatbuffers { class FlatBufferBuilder; }
-namespace simulation { class Player; }
-namespace simulation { class PlayerProvider; }
+namespace server { class PlayerProvider; }
 
 
-namespace simulation {
+namespace server {
     class World {
     protected:
         std::shared_ptr<PlayerProvider> _playerProvider;

@@ -8,9 +8,9 @@
 #include "world.hpp"
 namespace flatbuffers { class FlatBufferBuilder; }
 namespace server { class IMsgQueue; }
-namespace simulation { class Player; }
+namespace server { class Player; }
 
-namespace simulation {
+namespace server {
     class SerializableWorld: public World {
     private:
         using SerializableWorld_ptr = std::shared_ptr<SerializableWorld>;
@@ -45,7 +45,7 @@ namespace simulation {
                          const WebClient_ptr& webClient) {
             static_assert(
                 std::is_base_of<SerializableWorld, T>::value,
-                "T must be a descendant of simulation::SerializableWorld"
+                "T must be a descendant of server::SerializableWorld"
             );
 
             auto newWorld = [&](int id) {

@@ -14,7 +14,7 @@
 #include "server.hpp"
 
 
-namespace simulation {
+namespace server {
     std::atomic<std::size_t>
     SerializableWorld::currentlyAllocatedMsgInstances(0);
 

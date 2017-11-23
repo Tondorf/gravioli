@@ -9,7 +9,7 @@
 #include "playerProvider.hpp"
 
 
-class TestWebClient: public simulation::PlayerProvider::WebClient {
+class TestWebClient: public server::PlayerProvider::WebClient {
 public:
     TestWebClient() {
     }
@@ -36,20 +36,20 @@ public:
 };
 
 
-class TestPlayerProvider : public simulation::PlayerProvider {
+class TestPlayerProvider : public server::PlayerProvider {
 public:
     TestPlayerProvider():
-        simulation::PlayerProvider(std::make_shared<TestWebClient>()) {
+        server::PlayerProvider(std::make_shared<TestWebClient>()) {
     }
 
     virtual ~TestPlayerProvider() = default;
 
     std::vector<int> getPlayerIDs() {
-        return simulation::PlayerProvider::getPlayerIDs();
+        return server::PlayerProvider::getPlayerIDs();
     }
 
-    stdx::optional<std::shared_ptr<simulation::Player>> getPlayerById(int id) {
-        return simulation::PlayerProvider::getPlayerById(id);
+    stdx::optional<std::shared_ptr<server::Player>> getPlayerById(int id) {
+        return server::PlayerProvider::getPlayerById(id);
     }
 
     BinaryPlayerDataStatus getPlayerDataStatus() {
@@ -77,8 +77,8 @@ TEST_F(PlayerProvider, readsPlayerIDsFromJSON) {
 }
 
 
-inline ::testing::AssertionResult equal(const simulation::Player& a,
-                                        const simulation::Player& b) {
+inline ::testing::AssertionResult equal(const server::Player& a,
+                                        const server::Player& b) {
 
     constexpr auto N = crypto::KEY_BLOCKSIZE;
     auto k1 = a.getKey();
@@ -115,14 +115,14 @@ TEST_F(PlayerProvider, readsPlayerFromJSON) {
     ASSERT_TRUE(player2 ? true : false);
     ASSERT_FALSE(equal(*(player1.value()), *(player2.value())));
 
-    ASSERT_TRUE(equal(*(player1.value()), simulation::Player(0, crypto::Key {
+    ASSERT_TRUE(equal(*(player1.value()), server::Player(0, crypto::Key {
         0x00, 0x01, 0x02, 0x03,
         0x04, 0x05, 0x06, 0x07,
         0x08, 0x09, 0x0a, 0x0b,
         0x0c, 0x0d, 0x0e, 0x0f
     })));
 
-    ASSERT_TRUE(equal(*(player2.value()), simulation::Player(1, crypto::Key {
+    ASSERT_TRUE(equal(*(player2.value()), server::Player(1, crypto::Key {
         0x01, 0x01, 0x02, 0x03,
         0x04, 0x05, 0x06, 0x07,
         0x08, 0x09, 0x0a, 0x0b,

@@ -6,7 +6,7 @@
 #include "flatbuffers/flatbuffers.h"
 #include "world_generated.h"
 namespace server { class IMsgQueue; }
-namespace simulation { class Player; }
+namespace server { class Player; }
 
 
 constexpr double pi = 3.14159265359;
@@ -15,7 +15,7 @@ constexpr double pi = 3.14159265359;
 namespace gravioli {
     GravioliWorld::GravioliWorld(
         int id,
-        std::shared_ptr<simulation::PlayerProvider> playerProvider,
+        std::shared_ptr<server::PlayerProvider> playerProvider,
         std::shared_ptr<server::IMsgQueue> msgQueue) :
         SerializableWorld(id, playerProvider, msgQueue),
         _rndgen(_rnddev()) {
@@ -57,7 +57,7 @@ namespace gravioli {
 
 
     void GravioliWorld::serializeWorldForPlayer(
-        std::shared_ptr<simulation::Player> /*player*/,
+        std::shared_ptr<server::Player> /*player*/,
         flatbuffers::FlatBufferBuilder *builder) {
 
         std::vector<flatbuffers::Offset<game::Planet>> planets;

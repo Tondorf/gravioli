@@ -5,7 +5,7 @@
 
 
 namespace gravioli {
-    class GravioliWebClient : public simulation::PlayerProvider::WebClient {
+    class GravioliWebClient : public server::PlayerProvider::WebClient {
     public:
         GravioliWebClient();
 

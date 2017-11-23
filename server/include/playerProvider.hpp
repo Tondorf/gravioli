@@ -6,10 +6,10 @@
 #include <vector>
 #include "runnable.hpp"
 #include "optional.hpp"
-namespace simulation { class Player; }
+namespace server { class Player; }
 
 
-namespace simulation {
+namespace server {
     class PlayerProvider: public utils::Runnable {
     public:
         class WebClient {

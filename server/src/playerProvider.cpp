@@ -1,6 +1,7 @@
 #include "playerProvider.hpp"
 #include <cstddef>
 #include <exception>
+#include <memory>
 #include <string>
 #include <thread>
 #include "SimpleLogger/logger.hpp"
@@ -10,7 +11,7 @@
 #include "player.hpp"
 
 
-namespace simulation {
+namespace server {
     PlayerProvider::PlayerProvider(const std::shared_ptr<WebClient>& webClient):
         _playerDataStatus(BinaryPlayerDataStatus::AWAIT_NEW_DATA),
         _webclient(webClient) {

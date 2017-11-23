@@ -4,7 +4,7 @@
 #include "crypto.hpp"
 
 
-namespace simulation {
+namespace server {
     class Player {
     private:
         const std::uint64_t ID;

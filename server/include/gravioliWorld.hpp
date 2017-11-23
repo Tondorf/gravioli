@@ -8,8 +8,8 @@
 #include "serializableWorld.hpp"
 namespace flatbuffers { class FlatBufferBuilder; }
 namespace server { class IMsgQueue; }
-namespace simulation { class Player; }
-namespace simulation { class PlayerProvider; }
+namespace server { class Player; }
+namespace server { class PlayerProvider; }
 
 
 namespace gravioli {
@@ -19,7 +19,7 @@ namespace gravioli {
         Vec3d pos;
     };
 
-    class GravioliWorld : public simulation::SerializableWorld {
+    class GravioliWorld : public server::SerializableWorld {
     private:
         std::random_device _rnddev;
         std::mt19937 _rndgen;
@@ -31,7 +31,7 @@ namespace gravioli {
         virtual void loop(std::uint64_t) override;
 
         virtual void serializeWorldForPlayer(
-            std::shared_ptr<simulation::Player>,
+            std::shared_ptr<server::Player>,
             flatbuffers::FlatBufferBuilder *
         ) override;
 
@@ -39,7 +39,7 @@ namespace gravioli {
         GravioliWorld() = delete;
 
         GravioliWorld(int id,
-                      std::shared_ptr<simulation::PlayerProvider>,
+                      std::shared_ptr<server::PlayerProvider>,
                       std::shared_ptr<server::IMsgQueue>);
 
         GravioliWorld(const GravioliWorld&) = delete;
