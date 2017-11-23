@@ -1,12 +1,12 @@
-#include "webclient.hpp"
+#include "gravioliWebClient.hpp"
 
 
-namespace utils  {
-    WebClient::WebClient() {
+namespace gravioli  {
+    GravioliWebClient::GravioliWebClient() {
     }
 
 
-    WebClient::Response WebClient::get(const std::string& url) {
+    GravioliWebClient::Response GravioliWebClient::get(const std::string& url) {
         if (url == "players") {
             return {"{ \"IDs\": [0, 1] }", 200};
         } else if (url == "player/0") {

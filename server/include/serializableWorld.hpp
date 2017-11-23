@@ -14,6 +14,7 @@ namespace simulation {
     class SerializableWorld: public World {
     private:
         using SerializableWorld_ptr = std::shared_ptr<SerializableWorld>;
+        using WebClient_ptr = std::shared_ptr<PlayerProvider::WebClient>;
         using MsgQueue_ptr = std::shared_ptr<server::IMsgQueue>;
 
         MsgQueue_ptr _msgQueue;
@@ -40,14 +41,17 @@ namespace simulation {
 
         template <class T>
         static void init(std::vector<std::shared_ptr<T>>& worlds,
-                         MsgQueue_ptr msgQueue) {
+                         MsgQueue_ptr msgQueue,
+                         const WebClient_ptr& webClient) {
             static_assert(
                 std::is_base_of<SerializableWorld, T>::value,
                 "T must be a descendant of simulation::SerializableWorld"
             );
 
-            auto newWorld = [&msgQueue](int id) {
-                auto&& playerProvider = std::make_shared<PlayerProvider>();
+            auto newWorld = [&](int id) {
+                auto&& playerProvider = std::make_shared<PlayerProvider>(
+                    webClient
+                );
                 return std::make_shared<T>(id, playerProvider, msgQueue);
             };
             worlds.push_back(newWorld(0));

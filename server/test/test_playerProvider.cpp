@@ -7,10 +7,9 @@
 #include "crypto.hpp"
 #include "player.hpp"
 #include "playerProvider.hpp"
-#include "webclient.hpp"
 
 
-class TestWebClient: public utils::WebClient {
+class TestWebClient: public simulation::PlayerProvider::WebClient {
 public:
     TestWebClient() {
     }
@@ -40,8 +39,7 @@ public:
 class TestPlayerProvider : public simulation::PlayerProvider {
 public:
     TestPlayerProvider():
-        simulation::PlayerProvider() {
-        simulation::PlayerProvider::_webclient = TestWebClient();
+        simulation::PlayerProvider(std::make_shared<TestWebClient>()) {
     }
 
     virtual ~TestPlayerProvider() = default;

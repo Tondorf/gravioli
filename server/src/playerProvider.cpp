@@ -11,8 +11,9 @@
 
 
 namespace simulation {
-    PlayerProvider::PlayerProvider():
-        _playerDataStatus(BinaryPlayerDataStatus::AWAIT_NEW_DATA) {
+    PlayerProvider::PlayerProvider(const std::shared_ptr<WebClient>& webClient):
+        _playerDataStatus(BinaryPlayerDataStatus::AWAIT_NEW_DATA),
+        _webclient(webClient) {
     }
 
 
@@ -26,7 +27,7 @@ namespace simulation {
 
 
     std::vector<int> PlayerProvider::getPlayerIDs() {
-        const auto res = _webclient.get("players");
+        const auto res = _webclient->get("players");
 
         std::vector<int> playerIDs;
         if (res.statusCode != 200) {
@@ -63,7 +64,7 @@ namespace simulation {
         int id) {
 
         const auto url = std::string("player/") + std::to_string(id);
-        const auto res = _webclient.get(url);
+        const auto res = _webclient->get(url);
 
         if (res.statusCode != 200 || res.content.empty()) {
             return stdx::nullopt;

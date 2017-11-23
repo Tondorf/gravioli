@@ -12,14 +12,14 @@ namespace simulation { class Player; }
 namespace simulation { class PlayerProvider; }
 
 
-namespace simulation {
+namespace gravioli {
     using Vec3d = std::array<double, 3>;
 
     struct Planet {
         Vec3d pos;
     };
 
-    class GravioliWorld : public SerializableWorld {
+    class GravioliWorld : public simulation::SerializableWorld {
     private:
         std::random_device _rnddev;
         std::mt19937 _rndgen;
@@ -31,7 +31,7 @@ namespace simulation {
         virtual void loop(std::uint64_t) override;
 
         virtual void serializeWorldForPlayer(
-            std::shared_ptr<Player>,
+            std::shared_ptr<simulation::Player>,
             flatbuffers::FlatBufferBuilder *
         ) override;
 
@@ -39,7 +39,7 @@ namespace simulation {
         GravioliWorld() = delete;
 
         GravioliWorld(int id,
-                      std::shared_ptr<PlayerProvider>,
+                      std::shared_ptr<simulation::PlayerProvider>,
                       std::shared_ptr<server::IMsgQueue>);
 
         GravioliWorld(const GravioliWorld&) = delete;
