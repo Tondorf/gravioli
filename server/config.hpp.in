@@ -6,6 +6,21 @@
 #include "tools.hpp"
 
 
+using port_t = std::uint16_t;
+using byte = std::uint8_t;
+
+constexpr port_t DEFAULT_PORT = 8888;
+
+enum class CryptoLevel {
+    FAST, HIGH, ACADEMIC
+};
+constexpr CryptoLevel CRYPTO_LEVEL = CryptoLevel::FAST;
+
+constexpr std::chrono::milliseconds SERVER_SLEEP(10);
+constexpr std::chrono::milliseconds WORLD_SLEEP(1000);
+constexpr std::chrono::milliseconds USER_SYNC_INTERVAL(1000);
+constexpr std::size_t MAX_ALLOCATED_MSG_INSTANCES = 10;
+
 constexpr unsigned int VERSION_MAJOR = @VERSION_MAJOR@;
 constexpr unsigned int VERSION_MINOR = @VERSION_MINOR@;
 
@@ -21,27 +36,7 @@ constexpr BuildType BUILD_TYPE = []() {
     }
     return BuildType::DEBUG;
 }();
-
-constexpr const char *SPLASH_FILE = "splash.txt";
-
-using port_t = std::uint16_t;
-constexpr port_t DEFAULT_PORT = 8888;
-
 constexpr const char *LOGDATE_LOCALE = "en_US.UTF8";
 constexpr const char *LOGDATE_FORMAT = "%d/%b/%Y:%H:%M:%S %z";
 
-enum class CryptoLevel {
-    FAST, HIGH, ACADEMIC
-};
-constexpr CryptoLevel CRYPTO_LEVEL = CryptoLevel::FAST;
-
-using byte = std::uint8_t;
-
-constexpr std::chrono::milliseconds SERVER_SLEEP(10);
-
-constexpr std::chrono::milliseconds WORLD_SLEEP(1000);
-constexpr std::size_t MAX_ALLOCATED_MSG_INSTANCES = 10;
-
-constexpr std::chrono::milliseconds USER_SYNC_INTERVAL(1000);
-
-constexpr double pi = 3.14159265359;
+constexpr const char *SPLASH_FILE = "splash.txt";

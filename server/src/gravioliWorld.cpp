@@ -10,6 +10,9 @@ namespace server { class IMsgQueue; }
 namespace simulation { class Player; }
 
 
+constexpr double pi = 3.14159265359;
+
+
 namespace simulation {
     GravioliWorld::GravioliWorld(
         int id,
